@@ -1,4 +1,5 @@
-﻿using lab1.expressions;
+﻿using lab1.exceptions;
+using lab1.expressions;
 
 var operators = new Dictionary<string, string>()
 {
@@ -22,27 +23,35 @@ var operands = new Dictionary<int, string>()
 
 try
 {
-    var mode = takeArgOrThrow(0);
+    var mode = takeArgOrThrow(0, "режим");
     ExpressionCreator expressionCreator = mode switch
     {
         "G" or "g" => InitGenerator(),
         "T" or "t" => InitTranslator(),
-        _ => throw new NotImplementedException()
+        _ => throw new ValidationException("Доступные режимы утилиты: " +
+            $"T(t) - режим трансляции, G(g) - режим генерации. Найдено {mode}")
     };
     var expressions = expressionCreator.CreateExpressions();
     WriteExpressionsInFile(expressions);
-    expressions.ForEach(expression => Console.WriteLine(expression));
 }
-catch (Exception ex)
+catch (ParameterNotFoundException ex)
 {
-    throw ex;
+    Console.WriteLine($"Параметр {ex.ParameterName}({ex.ParameterNumber}) не найден");
+}
+catch (InputFileNotFoundException)
+{
+    Console.WriteLine("Файл исходных данных не найден");
+}
+catch (ValidationException ex)
+{
+    Console.WriteLine("Неправильное значение параметра:\n" + ex.ValidationMessage);
 }
 
 ExpressionCreator InitGenerator()
 {
-    var expressionCount = int.Parse(takeArgOrThrow(2));
-    var minOperands = int.Parse(takeArgOrThrow(3));
-    var maxOperands = int.Parse(takeArgOrThrow(4));
+    var expressionCount = int.Parse(takeArgOrThrow(2, "количество выражений"));
+    var minOperands = int.Parse(takeArgOrThrow(3, "минимальное количество операндов"));
+    var maxOperands = int.Parse(takeArgOrThrow(4, "максимальное количество операндов"));
     return new ExpressionGenerator(expressionCount, minOperands, maxOperands, operators, operands);
 }
 
@@ -54,28 +63,42 @@ ExpressionCreator InitTranslator()
 
 void WriteExpressionsInFile(List<String> expressions)
 {
-    var outputFileName = takeArgOrThrow(1);
+    var outputFileName = takeArgOrThrow(1, "файл записи результатов");
     using var writer = new StreamWriter(outputFileName, false);
     expressions.ForEach(expression => writer.WriteLine(expression));
 }
 
 List<string> ReadExpressionsFromFile()
 {
-    var inputFileName = args[2];
+    var inputFileName = takeArgOrThrow(2, "файл исходных данных");
     List<string> expressions = new();
-    using (var reader = new StreamReader(inputFileName))
+    try
     {
-        var expression = reader.ReadLine();
-        while (expression != null)
+        using (var reader = new StreamReader(inputFileName))
         {
-            expressions.Add(expression);
-            expression = reader.ReadLine();
+            var expression = reader.ReadLine();
+            while (expression != null)
+            {
+                expressions.Add(expression);
+                expression = reader.ReadLine();
+            }
         }
+        return expressions;
     }
-    return expressions;
+    catch (FileNotFoundException)
+    {
+        throw new InputFileNotFoundException();
+    }
 }
 
-string takeArgOrThrow(int argNumber)
+string takeArgOrThrow(int argNumber, string parameterName = "")
 {
-    return args[argNumber];
+    try
+    {
+        return args[argNumber];
+    }
+    catch
+    {
+        throw new ParameterNotFoundException(parameterName, argNumber);
+    }
 }
