@@ -178,7 +178,7 @@ int CastStringToIntOrThrow(string arg)
 string ValidateStringIsOneOfValues(string arg, params string[] values)
 {
     if (values.Contains(arg)) return arg;
-    throw new ValidationException($"Значение {arg} является не допустимым. Допустимые значения: {values}.");
+    throw new ValidationException($"Значение {arg} является не допустимым. Допустимые значения: {string.Join(", ", values)}.");
 }
 
 int ValidateIntInRange(int value, int minValue, int maxValue)
