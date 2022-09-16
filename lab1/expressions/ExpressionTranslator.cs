@@ -2,17 +2,17 @@
 {
     internal class ExpressionTranslator : ExpressionCreator
     {
-        private readonly List<string> sourceExpressions;
+        private readonly List<string> _sourceExpressions;
 
         public ExpressionTranslator(List<string> sourceExpressions, Dictionary<string, string> operations, Dictionary<int, string> operands)
             : base(operations, operands)
         {
-            this.sourceExpressions = sourceExpressions;
+            this._sourceExpressions = sourceExpressions;
         }
 
         public override List<string> CreateExpressions()
         {
-            return this.sourceExpressions.ConvertAll(expression => TranslateExpression(expression));
+            return this._sourceExpressions.ConvertAll(expression => TranslateExpression(expression));
         }
 
         private string TranslateExpression(string sourceExpression)
@@ -26,7 +26,7 @@
         private string TranslateOperands(string sourceExpression)
         {
             var expression = sourceExpression;
-            foreach (var (value, text) in this.operands)
+            foreach (var (value, text) in this._operands)
             {
                 expression = expression.Replace(value.ToString(), text);
             }
@@ -36,7 +36,7 @@
         private string TranslateOperations(string sourceExpression)
         {
             var expression = sourceExpression;
-            foreach (var (value, text) in this.operations)
+            foreach (var (value, text) in this._operations)
             {
                 expression = expression.Replace(value, text);
             }

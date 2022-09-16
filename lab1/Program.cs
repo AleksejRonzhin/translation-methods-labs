@@ -1,5 +1,7 @@
-﻿using lab1.exceptions;
-using lab1.expressions;
+﻿using lab1.expressions;
+using lab1.parameters;
+using library.exceptions;
+using library.parameters.validators;
 
 var operators = new Dictionary<string, string>()
 {
@@ -23,7 +25,7 @@ var operands = new Dictionary<int, string>()
 
 try
 {
-    var mode = GetMode();
+    var mode = new ModeParameter(TakeArgOrThrow(0, "режим программы")).GetValue();
     ExpressionCreator expressionCreator = mode switch
     {
         "G" or "g" => InitGenerator(),
@@ -33,24 +35,29 @@ try
     var expressions = expressionCreator.CreateExpressions();
     WriteExpressionsInFile(expressions);
 }
+#region Обработка ошибок
 catch (ParameterNotFoundException ex)
 {
-    Console.WriteLine($"Параметр {ex.ParameterName}({ex.ParameterNumber}) не найден");
+    Console.WriteLine($"Параметр {ex.ParameterName}({ex.ParameterNumber}) не найден.");
 }
 catch (InputFileNotFoundException)
 {
-    Console.WriteLine("Файл исходных данных не найден");
+    Console.WriteLine("Файл исходных данных не найден.");
 }
 catch (ValidationException ex)
 {
     Console.WriteLine("Неправильное значение параметра.\n" + ex.ValidationMessage);
 }
+#endregion
 
 ExpressionCreator InitGenerator()
 {
-    var expressionCount = GetExpressionCount();
-    var (minOperands, maxOperands) = GetOperandRange();
-    return new ExpressionGenerator(expressionCount, minOperands, maxOperands, operators, operands);
+    var expressionCount = new ExpressionCountParameter(TakeArgOrThrow(2, "количество выражений")).GetValue();
+    var minOperands = new MinOperandsParameter(TakeArgOrThrow(3, "минимальное количество операндов")).GetValue();
+    var maxOperands = new MaxOperandsParameter(TakeArgOrThrow(4, "максимальное количество операндов")).GetValue();
+    var range = (minOperands, maxOperands);
+    new IntRangeLimitsValidator().Validate(range);
+    return new ExpressionGenerator(expressionCount, range, operators, operands);
 }
 
 ExpressionCreator InitTranslator()
@@ -61,14 +68,14 @@ ExpressionCreator InitTranslator()
 
 void WriteExpressionsInFile(List<String> expressions)
 {
-    var outputFileName = GetOutputFilename();
+    var outputFileName = new OutputFilenameParameter(TakeArgOrThrow(1, "файл вывода")).GetValue();
     using var writer = new StreamWriter(outputFileName, false);
     expressions.ForEach(expression => writer.WriteLine(expression));
 }
 
 List<string> ReadExpressionsFromFile()
 {
-    var inputFileName = GetInputFilename();
+    var inputFileName = new OutputFilenameParameter(TakeArgOrThrow(2, "файл значений")).GetValue();
     List<string> expressions = new();
     try
     {
@@ -89,101 +96,14 @@ List<string> ReadExpressionsFromFile()
     }
 }
 
-string GetMode()
-{
-    return TakeArgOrThrow(0, MapMode, "режим программы");
-}
-
-int GetExpressionCount()
-{
-    return TakeArgOrThrow(2, MapExpressionCount, "количество выражений");
-}
-
-(int min, int max) GetOperandRange()
-{
-    var min = TakeArgOrThrow(3, MapMinOperand, "минимальное количество операндов");
-    var max = TakeArgOrThrow(4, MapMaxOperand, "максимальное количество операндов");
-    if (min > max) throw new ValidationException($"Минимальное значение ({min}) больше максимального ({max}).");
-    return (min, max);
-}
-
-string GetOutputFilename()
-{
-    return TakeArgOrThrow(1, MapInputFilename, "файл записи результатов");
-}
-
-string GetInputFilename()
-{
-    return TakeArgOrThrow(2, MapOutputFilename, "файл исходных данных");
-}
-
-T TakeArgOrThrow<T>(int argNumber, Func<string, T> mapper, string parameterName = "")
+string TakeArgOrThrow(int argNumber, string parameterName = "")
 {
     try
     {
-        return mapper(args[argNumber]);
-    }
-    catch (ValidationException ex)
-    {
-        throw new ValidationException($"Значение параметра {parameterName} некорректно.\n" + ex.ValidationMessage);
+        return args[argNumber];
     }
     catch
     {
         throw new ParameterNotFoundException(parameterName, argNumber);
     }
-}
-
-string MapMode(string arg)
-{
-    return ValidateStringIsOneOfValues(arg, "g", "G", "t", "T");
-}
-
-int MapExpressionCount(string arg)
-{
-    return ValidateIntInRange(CastStringToIntOrThrow(arg), 0, 50);
-}
-
-int MapMinOperand(string arg)
-{
-    return ValidateIntInRange(CastStringToIntOrThrow(arg), 0, 10);
-}
-
-int MapMaxOperand(string arg)
-{
-    return ValidateIntInRange(CastStringToIntOrThrow(arg), 0, 10);
-}
-
-string MapInputFilename(string arg)
-{
-    return arg;
-}
-
-string MapOutputFilename(string arg)
-{
-    return arg;
-}
-
-int CastStringToIntOrThrow(string arg)
-{
-    try
-    {
-        return int.Parse(arg);
-    }
-    catch
-    {
-        throw new ValidationException($"{arg} не является целым числом.");
-    }
-}
-
-string ValidateStringIsOneOfValues(string arg, params string[] values)
-{
-    if (values.Contains(arg)) return arg;
-    throw new ValidationException($"Значение {arg} является не допустимым. Допустимые значения: {string.Join(", ", values)}.");
-}
-
-int ValidateIntInRange(int value, int minValue, int maxValue)
-{
-    var isRigthValue = value >= minValue && value <= maxValue;
-    if (isRigthValue) return value;
-    else throw new ValidationException($"{value} не лежит в диапазоне [{minValue}, {maxValue}].");
 }

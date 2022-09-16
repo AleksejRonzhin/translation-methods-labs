@@ -4,25 +4,23 @@ namespace lab1.expressions
 {
     internal class ExpressionGenerator : ExpressionCreator
     {
-        private readonly int expressionsCount;
-        private readonly int minOperands;
-        private readonly int maxOperands;
-        private readonly Random random = new();
+        private readonly int _expressionsCount;
+        private readonly (int min, int max) _range;
+        private readonly Random _random = new();
 
-        public ExpressionGenerator(int expressionsCount, int minOperands, int maxOperands, Dictionary<string, string> operations, Dictionary<int, string> operands) :
+        public ExpressionGenerator(int expressionsCount, (int min, int max) range, Dictionary<string, string> operations, Dictionary<int, string> operands) :
             base(operations, operands)
         {
-            this.expressionsCount = expressionsCount;
-            this.minOperands = minOperands;
-            this.maxOperands = maxOperands;
+            this._expressionsCount = expressionsCount;
+            this._range = range;
         }
 
         public override List<string> CreateExpressions()
         {
             var expressions = new List<string>();
-            for (int i = 0; i < expressionsCount; i++)
+            for (int i = 0; i < _expressionsCount; i++)
             {
-                var operandCount = this.random.Next(minOperands, maxOperands);
+                var operandCount = this._random.Next(this._range.min, this._range.max);
                 var operands = GenerateOperands(operandCount);
                 var expression = string.Join($" {GenerateOperation()} ", operands);
                 expressions.Add(expression);
@@ -32,7 +30,7 @@ namespace lab1.expressions
 
         private ICollection<int> GenerateOperands(int count)
         {
-            var operandValues = new List<int>(this.operands.Keys);
+            var operandValues = new List<int>(this._operands.Keys);
             var operands = new List<int>(count);
             for (int i = 0; i < count; i++)
             {
@@ -43,13 +41,13 @@ namespace lab1.expressions
 
         private string GenerateOperation()
         {
-            var operationValues = new List<string>(this.operations.Keys);
+            var operationValues = new List<string>(this._operations.Keys);
             return GetRandomValueFromList<string>(operationValues);
         }
 
         private T GetRandomValueFromList<T>(List<T> list)
         {
-            var randomIndex = random.Next(list.Count);
+            var randomIndex = this._random.Next(list.Count);
             return list[randomIndex];
         }
     }

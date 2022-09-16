@@ -1,6 +1,6 @@
-﻿namespace lab1.exceptions
+﻿namespace library.exceptions
 {
-    internal class ValidationException : Exception
+    public class ValidationException : Exception
     {
         public string ValidationMessage { get; }
 
