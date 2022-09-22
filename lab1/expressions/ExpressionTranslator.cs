@@ -1,4 +1,6 @@
-﻿namespace lab1.expressions
+﻿using System.Text;
+
+namespace lab1.expressions
 {
     internal class ExpressionTranslator : ExpressionCreator
     {
@@ -17,30 +19,56 @@
 
         private string TranslateExpression(string sourceExpression)
         {
-            var expression = sourceExpression;
-            expression = TranslateOperands(expression);
-            expression = TranslateOperations(expression);
-            return expression;
+            if (sourceExpression == "") return "";
+            var parts = sourceExpression.Split();
+            bool nextOperand = true;
+            var result = new StringBuilder();
+            foreach (string part in parts)
+            {
+                string translatedPart;
+                if (nextOperand)
+                {
+                    try
+                    {
+                        translatedPart = TranslateOperand(int.Parse(part));
+                    }
+                    catch (FormatException)
+                    {
+                        throw new OperandNotIntegerException(part);
+                    }
+                }
+                else
+                {
+                    translatedPart = TranslateOperation(part);
+                }
+                result.Append(translatedPart).Append(' ');
+                nextOperand = !nextOperand;
+            }
+            return result.ToString();
         }
 
-        private string TranslateOperands(string sourceExpression)
+        private string TranslateOperand(int operand)
         {
-            var expression = sourceExpression;
-            foreach (var (value, text) in this._operands)
+            try
             {
-                expression = expression.Replace(value.ToString(), text);
+                return this._operands[operand];
             }
-            return expression;
+            catch (KeyNotFoundException)
+            {
+                throw new OperandNotFoundException(operand);
+            }
         }
 
-        private string TranslateOperations(string sourceExpression)
+        private string TranslateOperation(string operation)
         {
-            var expression = sourceExpression;
-            foreach (var (value, text) in this._operations)
+            try
             {
-                expression = expression.Replace(value, text);
+                return this._operations[operation];
             }
-            return expression;
+            catch (KeyNotFoundException)
+            {
+                throw new OperationNotFoundException(operation);
+            }
         }
     }
 }

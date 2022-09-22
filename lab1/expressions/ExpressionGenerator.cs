@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace lab1.expressions
+﻿namespace lab1.expressions
 {
     internal class ExpressionGenerator : ExpressionCreator
     {
@@ -20,15 +18,30 @@ namespace lab1.expressions
             var expressions = new List<string>();
             for (int i = 0; i < _expressionsCount; i++)
             {
-                var operandCount = this._random.Next(this._range.min, this._range.max);
-                var operands = GenerateOperands(operandCount);
-                var expression = string.Join($" {GenerateOperation()} ", operands);
-                expressions.Add(expression);
+                expressions.Add(CreateExpression());
             }
             return expressions;
         }
 
-        private ICollection<int> GenerateOperands(int count)
+        private string CreateExpression()
+        {
+            var operandCount = this._random.Next(this._range.min, this._range.max);
+            var operands = GenerateOperands(operandCount);
+            return JoinExpression(operands);
+        }
+
+        private string JoinExpression(List<int> operands)
+        {
+            if (operands.Count == 0) return "";
+            var result = operands.First().ToString();
+            for (var i = 1; i < operands.Count; i++)
+            {
+                result = result + $" {GenerateOperation()} " + operands[i].ToString();
+            }
+            return result;
+        }
+
+        private List<int> GenerateOperands(int count)
         {
             var operandValues = new List<int>(this._operands.Keys);
             var operands = new List<int>(count);

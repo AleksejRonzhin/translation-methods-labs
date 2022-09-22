@@ -1,4 +1,5 @@
-﻿using lab1.expressions;
+﻿using lab1;
+using lab1.expressions;
 using lab1.parameters;
 using library.exceptions;
 using library.parameters.validators;
@@ -48,6 +49,18 @@ catch (ValidationException ex)
 {
     Console.WriteLine("Неправильное значение параметра.\n" + ex.ValidationMessage);
 }
+catch (OperandNotIntegerException ex)
+{
+    Console.WriteLine($"Операнд {ex.Operand} не является числом");
+}
+catch (OperandNotFoundException ex)
+{
+    Console.WriteLine($"Операнд {ex.Operand} не найден");
+}
+catch(OperationNotFoundException ex)
+{
+    Console.WriteLine($"Операция {ex.Operation} не найдена");
+}
 #endregion
 
 ExpressionCreator InitGenerator()
@@ -66,7 +79,7 @@ ExpressionCreator InitTranslator()
     return new ExpressionTranslator(expressions, operators, operands);
 }
 
-void WriteExpressionsInFile(List<String> expressions)
+void WriteExpressionsInFile(List<string> expressions)
 {
     var outputFileName = new OutputFilenameParameter(TakeArgOrThrow(1, "файл вывода")).GetValue();
     using var writer = new StreamWriter(outputFileName, false);
