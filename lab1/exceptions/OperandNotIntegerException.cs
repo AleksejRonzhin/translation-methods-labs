@@ -1,4 +1,4 @@
-﻿namespace lab1
+﻿namespace lab1.exceptions
 {
     public class OperandNotIntegerException : Exception
     {

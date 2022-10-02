@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using lab1.exceptions;
+using System.Text;
 
 namespace lab1.expressions
 {
