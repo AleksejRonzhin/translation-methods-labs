@@ -1,16 +1,10 @@
 ﻿namespace lab2.tokens
 {
-    internal class TokenType
+    internal enum TokenType
     {
-        public Predicate<char> StartSymbolPredicate { get; }
-        public Predicate<char> SymbolPredicate { get; }
-        public bool NeedAttributeValue;
-
-        public TokenType(Predicate<char> startSymbolPredicate, Predicate<char> symbolPredicate, bool needAttributeValue = false)
-        {
-            StartSymbolPredicate = startSymbolPredicate;
-            SymbolPredicate = symbolPredicate;
-            NeedAttributeValue = needAttributeValue;
-        }
+        CONSTANT_TOKEN,
+        CURLY_BRACES_TOKEN,
+        IDENTIFIER_TOKEN,
+        OPERATION_TOKEN
     }
 }
