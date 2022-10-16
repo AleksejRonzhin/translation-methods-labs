@@ -1,12 +1,12 @@
-﻿using lab2.exceptions;
-using lab2.tokens;
-using lab2.tokens.creators;
+﻿using library.tokens;
+using library.tokens.creators;
+using library.tokens.exceptions;
 
-namespace lab2
+namespace library.lexis
 {
-    internal class LexicalAnalyzer
+    public class LexicalAnalyzer
     {
-        internal (List<Token> tokens,  SymbolsTable table) Analyze(TextReader textReader)
+        public static (List<Token> tokens,  SymbolsTable table) Analyze(TextReader textReader)
         {
             var reader = new PositionTextReader(textReader);
             List<Token> tokens = new();
@@ -70,7 +70,7 @@ namespace lab2
             #endregion
         }
 
-        private void CheckTokensConflict(Token token, Token? lastToken)
+        private static void CheckTokensConflict(Token token, Token? lastToken)
         {
             if (lastToken == null) return;
             if (token.Type == TokenType.IDENTIFIER_TOKEN 

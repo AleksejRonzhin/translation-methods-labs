@@ -1,4 +1,4 @@
-﻿namespace lab2.exceptions
+﻿namespace library.tokens.exceptions
 {
     internal class InvalidConstantException : Exception
     {

@@ -1,6 +1,6 @@
-﻿namespace lab2
+﻿namespace library
 {
-    internal class SymbolsTable
+    public class SymbolsTable
     {
         public SymbolsTable()
         {

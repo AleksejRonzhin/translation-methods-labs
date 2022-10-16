@@ -1,6 +1,6 @@
-﻿namespace lab2.tokens
+﻿namespace library.tokens
 {
-    internal class Token
+    public class Token
     {
         public Token(string tokenName, string text, TokenType type, int? attributeValue = null)
         {

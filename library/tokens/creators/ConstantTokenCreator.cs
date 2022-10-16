@@ -1,6 +1,6 @@
-﻿using lab2.exceptions;
+﻿using library.tokens.exceptions;
 
-namespace lab2.tokens.creators
+namespace library.tokens.creators
 {
     internal class ConstantTokenCreator : TokenCreator
     {

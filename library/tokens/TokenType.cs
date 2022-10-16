@@ -1,6 +1,6 @@
-﻿namespace lab2.tokens
+﻿namespace library.tokens
 {
-    internal enum TokenType
+    public enum TokenType
     {
         CONSTANT_TOKEN,
         CURLY_BRACES_TOKEN,

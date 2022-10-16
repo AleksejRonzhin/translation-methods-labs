@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace lab2
+﻿namespace library.lexis
 {
     internal class PositionTextReader
     {
-        private TextReader _textReader;
+        private readonly TextReader _textReader;
         private int position = 0;
 
         public PositionTextReader(TextReader textReader)

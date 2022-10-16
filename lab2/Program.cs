@@ -1,8 +1,9 @@
-﻿using lab2;
-using lab2.exceptions;
-using lab2.parameters;
-using lab2.tokens;
+﻿using lab2.parameters;
 using library.exceptions;
+using library.lexis;
+using library.tokens;
+using library;
+using library.lexis.exceptions;
 
 try
 {
@@ -12,7 +13,7 @@ try
 
     using (TextReader inputTextReader = new StreamReader(inputFilename))
     {
-        (List<Token> tokens, SymbolsTable table) = new LexicalAnalyzer().Analyze(inputTextReader);
+        (List<Token> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
         WriteTokens(tokensFilename, tokens);
         WriteSymbolsTable(symbolsTableFilename, table);
 

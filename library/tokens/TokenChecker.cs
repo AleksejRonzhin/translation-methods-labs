@@ -1,6 +1,6 @@
-﻿namespace lab2.tokens
+﻿namespace library.tokens
 {
-    internal class TokenChecker
+    public class TokenChecker
     {
         public Predicate<char> StartSymbolPredicate { get; }
         public Predicate<char> SymbolPredicate { get; }

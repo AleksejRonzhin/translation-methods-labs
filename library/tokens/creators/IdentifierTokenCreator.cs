@@ -1,4 +1,4 @@
-﻿namespace lab2.tokens.creators
+﻿namespace library.tokens.creators
 {
     internal class IdentifierTokenCreator : TokenCreator
     {
