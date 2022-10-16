@@ -1,6 +1,6 @@
 ﻿namespace library.tokens.exceptions
 {
-    internal class LexicalAnalyzerException : Exception
+    public class LexicalAnalyzerException : Exception
     {
         public LexicalAnalyzerException(int position, string message)
         {

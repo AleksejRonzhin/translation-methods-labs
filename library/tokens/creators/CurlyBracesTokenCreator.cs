@@ -10,7 +10,7 @@
         {
             string tokenName = this.tokenNameBuilder.ToString();
             string text = (tokenName == "(") ? "открыващая скобка" : "закрывающая скобка";
-            return new Token(tokenName, text, TokenType.CURLY_BRACES_TOKEN);
+            return CreateToken(tokenName, text, TokenType.CURLY_BRACES_TOKEN);
         }
 
         private class CurlyBracesTokenChecker : TokenChecker

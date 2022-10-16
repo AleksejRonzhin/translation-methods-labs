@@ -2,8 +2,9 @@
 {
     public class Token
     {
-        public Token(string tokenName, string text, TokenType type, int? attributeValue = null)
+        public Token(int position, string tokenName, string text, TokenType type, int? attributeValue = null)
         {
+            Position = position;
             TokenName = tokenName;
             AttributeValue = attributeValue;
             Text = text;
@@ -14,6 +15,8 @@
         public int? AttributeValue { get; }
         public string Text { get; }
         public TokenType Type { get; }
+
+        public int Position { get; }
 
         public override string ToString()
         {

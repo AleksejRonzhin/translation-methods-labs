@@ -24,7 +24,7 @@ namespace library.tokens.creators
             var pointCount = tokenName.Split('.').Length - 1;
             if (pointCount > 1) throw new InvalidConstantException(tokenName);
             var text = (pointCount == 1) ? "константа вещественного числа" : "константа целого числа";
-            return new Token(tokenName, text, TokenType.CONSTANT_TOKEN);
+            return CreateToken(tokenName, text, TokenType.CONSTANT_TOKEN);
         }
     }
 }

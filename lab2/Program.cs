@@ -1,22 +1,36 @@
 ﻿using lab2.parameters;
+using library;
 using library.exceptions;
 using library.lexis;
+using library.syntax;
 using library.tokens;
-using library;
-using library.lexis.exceptions;
+using library.tokens.exceptions;
 
 try
 {
-    var inputFilename = new InputFilenameParameter(TakeArgOrThrow(0, "файл исходного выражения")).GetValue();
-    var tokensFilename = new TokensFilenameParameter(TakeArgOrThrow(1, "файл токенов")).GetValue();
-    var symbolsTableFilename = new SymbolsTableFilenameParameter(TakeArgOrThrow(2, "файл таблицы символов")).GetValue();
-
+    var mode = new ModeParameter(TakeArgOrThrow(0, "режим")).GetValue();
+    var inputFilename = new InputFilenameParameter(TakeArgOrThrow(1, "файл исходного выражения")).GetValue();
+    
     using (TextReader inputTextReader = new StreamReader(inputFilename))
     {
         (List<Token> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
-        WriteTokens(tokensFilename, tokens);
-        WriteSymbolsTable(symbolsTableFilename, table);
-
+        tokens.ForEach(token => Console.WriteLine(token));
+        
+        switch (mode)
+        {
+            case "LEX":
+            case "lex":
+                var tokensFilename = new TokensFilenameParameter(TakeArgOrThrow(2, "файл токенов")).GetValue();
+                var symbolsTableFilename = new SymbolsTableFilenameParameter(TakeArgOrThrow(3, "файл таблицы символов")).GetValue();
+                WriteTokens(tokensFilename, tokens);
+                WriteSymbolsTable(symbolsTableFilename, table);
+                break;
+            case "SYN":
+            case "syn":
+                SyntaxTree syntaxTree = SyntaxAnalyzer.Analyze(tokens);
+                var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
+                break;
+        }
     }
 }
 # region Обработка ошибок
@@ -32,6 +46,10 @@ catch (LexicalAnalyzerException ex)
 {
     Console.WriteLine($"Лексическая ошибка в позиции {ex.Position}! {ex.Text}");
 }
+catch (ValidationException ex)
+{
+    Console.WriteLine("Неправильное значение параметра.\n" + ex.ValidationMessage);
+}
 #endregion
 
 
@@ -43,7 +61,7 @@ void WriteSymbolsTable(string symbolsTableFilename, SymbolsTable table)
         {
             writer.WriteLine($"{entry.Value} - {entry.Key}");
         }
-    }       
+    }
 }
 
 void WriteTokens(string tokensFilename, List<Token> tokens)
@@ -56,7 +74,6 @@ void WriteTokens(string tokensFilename, List<Token> tokens)
         });
     }
 }
-
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")
 {

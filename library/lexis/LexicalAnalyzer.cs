@@ -10,8 +10,7 @@ namespace library.lexis
         {
             var reader = new PositionTextReader(textReader);
             List<Token> tokens = new();
-            SymbolsTable symbolsTable = new SymbolsTable();
-
+            SymbolsTable symbolsTable = new();
             List<TokenCreator> creatorList = new()
             {
                 new IdentifierTokenCreator(symbolsTable),
@@ -30,7 +29,7 @@ namespace library.lexis
                     bool wasToken = false;
                     foreach (TokenCreator creator in creatorList)
                     {
-                        if (creator.Start(symbol))
+                        if (creator.Start(symbol, position + 1))
                         {
                             do
                             {
@@ -56,8 +55,8 @@ namespace library.lexis
             #region Обработка ошибок
             catch (TokensConflictException ex)
             {
-                int confilctPosition = (token == null)? position: position - token.TokenName.Length;
-                throw new LexicalAnalyzerException(confilctPosition, $"Между лексемами {ex.FirstToken.TokenName} и {ex.SecondToken.TokenName} отсутствует пробел");
+                int conflictPosition = (token == null) ? position : token.Position;
+                throw new LexicalAnalyzerException(conflictPosition, $"Между лексемами {ex.FirstToken.TokenName} и {ex.SecondToken.TokenName} отсутствует пробел");
             }
             catch (InvalidSymbolException ex)
             {

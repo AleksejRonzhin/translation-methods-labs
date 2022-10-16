@@ -14,7 +14,7 @@
             string tokenName = this.tokenNameBuilder.ToString();
             string text = $"идентификатор с именем {tokenName}";
             int attributeValue = _symbolsTable.Add(tokenName);
-            return new Token(tokenName, text, TokenType.IDENTIFIER_TOKEN, attributeValue);
+            return CreateToken(tokenName, text, TokenType.IDENTIFIER_TOKEN, attributeValue);
         }
 
         private class IdentifierTokenChecker : TokenChecker
