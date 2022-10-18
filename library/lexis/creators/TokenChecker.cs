@@ -1,4 +1,4 @@
-﻿namespace library.tokens.creators
+﻿namespace library.lexis.creators
 {
     internal class TokenChecker
     {

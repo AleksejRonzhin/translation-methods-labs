@@ -2,10 +2,10 @@
 using library;
 using library.exceptions;
 using library.lexis;
+using library.lexis.exceptions;
 using library.syntax;
 using library.syntax.exceptions;
 using library.tokens;
-using library.tokens.exceptions;
 
 try
 {
@@ -15,7 +15,7 @@ try
     using (TextReader inputTextReader = new StreamReader(inputFilename))
     {
         (List<TokenInfo> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
-        tokens.ForEach(token => Console.WriteLine(token));
+        //tokens.ForEach(token => Console.WriteLine(token));
         
         switch (mode)
         {

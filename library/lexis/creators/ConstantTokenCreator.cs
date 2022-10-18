@@ -1,6 +1,7 @@
-﻿using library.tokens.exceptions;
+﻿using library.lexis.exceptions;
+using library.tokens;
 
-namespace library.tokens.creators
+namespace library.lexis.creators
 {
     internal class ConstantTokenCreator : TokenCreator
     {

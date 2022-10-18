@@ -1,4 +1,6 @@
-﻿namespace library.tokens.creators
+﻿using library.tokens;
+
+namespace library.lexis.creators
 {
     internal class OperationTokenCreator : TokenCreator
     {

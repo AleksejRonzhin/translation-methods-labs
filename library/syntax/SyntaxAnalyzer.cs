@@ -9,20 +9,27 @@ namespace library.syntax
         {
             try
             {
-
                 var tokensWithoutBrackets = TakeOutBrackets(tokens);
-                tokensWithoutBrackets.ForEach(token => Console.WriteLine(token));
-                //CheckErrors(tokensWithoutBrackets);
+                CheckSyntax(tokensWithoutBrackets);
                 return CreateSyntaxTree(tokensWithoutBrackets);
-            } catch(OpenBracketNotFountException ex)
+            }
+            catch (OpenBracketNotFountException ex)
             {
                 throw new SyntaxAnalyzerException(ex.Position, "У закрывающей скобки <)> отсуствует открывающая скобка <(>.");
-            } catch(CloseBracketNotFoundException ex)
+            }
+            catch (CloseBracketNotFoundException ex)
             {
                 throw new SyntaxAnalyzerException(ex.Position, "У открывающей скобки <(> отсуствует закрывающая скобка <)>.");
-            } catch(SpaceBetweenBracketsException ex)
+            }
+            catch (SpaceBetweenBracketsException ex)
             {
                 throw new SyntaxAnalyzerException(ex.OpenBracketPosition, "Между скобками ничего нет.");
+            } catch (OperandNotFoundException ex)
+            {
+                throw new SyntaxAnalyzerException(ex.Position, $"У операции {ex.OperationToken} не найден операнд.");
+            } catch (OperationBetweenOperandsNotFoundException ex)
+            {
+                throw new SyntaxAnalyzerException(ex.Position, $"Между операндами {ex.FirstOperand} и {ex.SecondOperand} отсуствует операция.");
             }
         }
 
@@ -31,82 +38,108 @@ namespace library.syntax
             return null;
         }
 
-        /*private static void CheckErrors(List<TokenInfo> tokens)
+        private static void CheckSyntax(List<TokenInfo> tokenInfos)
         {
-            Console.WriteLine("Begin with " + tokens.First().Token.TokenName);
-            Console.WriteLine("Size " + tokens.Count);
+            if (tokenInfos.Count == 0) return;
 
-            for (int i = 0; i < tokens.Count; i++)
+            CheckFirstToken(tokenInfos.First());
+            CheckLastToken(tokenInfos.Last());
+            TokenInfo currentTokenInfo = tokenInfos.First();
+            for (int i = 1; i < tokenInfos.Count; i++)
             {
-                TokenType currentTokenType = tokens[i].Type;
-                TokenType? prevTokenType = (i - 1 == -1) ? null : tokens[i - 1].Type;
-                TokenType? nextTokenType = (i + 1 >= tokens.Count) ? null : tokens[i + 1].Type;
-                switch (currentTokenType)
-                {
-                    case TokenType.CONSTANT_TOKEN:
-                    case TokenType.IDENTIFIER_TOKEN:
-                        if (prevTokenType != null && prevTokenType != TokenType.OPERATION_TOKEN) throw new Exception(); // Слева нет оператора
-                        if (nextTokenType != null && nextTokenType != TokenType.OPERATION_TOKEN) throw new Exception(); // Справа нет оператора
-                        break;
-                    case TokenType.OPERATION_TOKEN:
-                        if (nextTokenType == null) throw new Exception(); // Справа нет опернада
-                        if (nextTokenType == TokenType.OPERATION_TOKEN) throw new Exception(); // Справа нет операнда
-                        if (prevTokenType == null)
-                        {
-                            Console.WriteLine(tokens[i].TokenName);
-                            throw new Exception(); // Слева нет операнда
-                        }
-                        if (prevTokenType == TokenType.OPERATION_TOKEN) throw new Exception(); // Слева нет операнда
-                        break;
-                    case TokenType.BRACKETS_TOKEN_GROUP: 
-                        if (prevTokenType != null && prevTokenType != TokenType.OPERATION_TOKEN) throw new Exception(); // Слева нет оператора
-                        if (nextTokenType != null && nextTokenType != TokenType.OPERATION_TOKEN) throw new Exception(); // Справа нет оператора
-                        CheckErrors((tokens[i] as UnderBracketsExpression).GetTokens());
-                        break;
-                }
+                TokenInfo nextTokenInfo = tokenInfos[i];
+                Token nextToken = nextTokenInfo.Token;
+
+                if (currentTokenInfo is UnderBracketsExpression expression)
+                    CheckUnderBracketsExpression(expression);
+
+                Token currentToken = currentTokenInfo.Token;
+                if (currentToken is OperationToken operationToken) 
+                    CheckOperation(operationToken, nextToken, currentTokenInfo.Position);
+
+                if (currentToken is OperandToken operandToken) 
+                    CheckOperand(operandToken, nextToken, currentTokenInfo.Position);
+
+                currentTokenInfo = nextTokenInfo;
             }
-        }*/
+        }
+
+        private static void CheckLastToken(TokenInfo tokenInfo)
+        {
+            if (tokenInfo.Token is OperationToken token) throw new OperandNotFoundException(token, tokenInfo.Position);
+        }
+
+        private static void CheckFirstToken(TokenInfo tokenInfo)
+        {
+            if (tokenInfo.Token is OperationToken token) throw new OperandNotFoundException(token, tokenInfo.Position);
+        }
+
+        private static void CheckUnderBracketsExpression(UnderBracketsExpression underBracketsExpression)
+        {
+            CheckSyntax(underBracketsExpression.GetTokens());
+        }
+
+        private static void CheckOperand(OperandToken token, Token nextToken, int position)
+        {
+            if (nextToken is OperandToken nextTokenTemp)            
+                throw new OperationBetweenOperandsNotFoundException(token, nextTokenTemp, position);
+            
+        }
+
+        private static void CheckOperation(OperationToken token, Token nextToken, int position)
+        {
+            if (nextToken is OperationToken) throw new OperandNotFoundException(token, position);
+        }
 
         private static List<TokenInfo> TakeOutBrackets(List<TokenInfo> tokenInfos)
         {
-            List<TokenInfo> tokensWithoutBrackets = new();
+            List<TokenInfo> tokensInfoWithoutBrackets = new();
             for (int i = 0; i < tokenInfos.Count; i++)
             {
                 var tokenInfo = tokenInfos[i];
-                if (tokenInfo.Token.TokenName == ")") throw new OpenBracketNotFountException(tokenInfo.Position);
-                if (tokenInfo.Token.TokenName == "(")
-                {
-                    (var sublist, i) = GetUnderBracketsToken(tokenInfos, i);
-                    tokensWithoutBrackets.Add(new UnderBracketsExpression(TakeOutBrackets(sublist)));
-                }
+                var token = tokenInfo.Token;
+                if (token is not BracketToken) 
+                    tokensInfoWithoutBrackets.Add(tokenInfo);
                 else
                 {
-                    tokensWithoutBrackets.Add(tokenInfo);
+                    if (token.TokenName == ")") throw new OpenBracketNotFountException(tokenInfo.Position);
+                    if (token.TokenName == "(")
+                    {
+                        (var underBracketsExpression, i) = GetUnderBracketsExpression(tokenInfos, i);
+                        var tokensWithoutBrackets = TakeOutBrackets(underBracketsExpression.GetTokens());
+                        tokensInfoWithoutBrackets.Add(new UnderBracketsExpression(tokensWithoutBrackets));
+                    }
                 }
             }
-            return tokensWithoutBrackets;
+            return tokensInfoWithoutBrackets;
         }
 
-        private static (List<TokenInfo>, int) GetUnderBracketsToken(List<TokenInfo> tokenInfos, int startIndex)
+        private static (UnderBracketsExpression, int) GetUnderBracketsExpression(List<TokenInfo> tokenInfos, int startIndex)
         {
+            int closedBracketIndex = FindClosedBracket(tokenInfos, startIndex);
+            if (closedBracketIndex - startIndex == 1) throw new SpaceBetweenBracketsException(tokenInfos[startIndex].Position);
+            var underBracketsExpressionTokens = tokenInfos.GetRange(startIndex + 1, closedBracketIndex - startIndex - 1);
+            return (new(underBracketsExpressionTokens), closedBracketIndex);
+        }
+
+        private static int FindClosedBracket(List<TokenInfo> tokenInfos, int startIndex)
+        {
+            // Счетчик незакрытых <(>
+            var bracketCounter = 1;
             int currentIndex;
-            var counter = 1;
             for (currentIndex = startIndex + 1; currentIndex < tokenInfos.Count; currentIndex++)
             {
                 var token = tokenInfos[currentIndex].Token;
-                if (token.TokenName == "(") counter++;
-                if (token.TokenName == ")") counter--;
-                if (counter == 0)
-                {
-                    break;
-                }
-            }
-            if (counter != 0)
-                throw new CloseBracketNotFoundException(tokenInfos[startIndex].Position);
+                if (token is not BracketToken) continue;
 
-            if (currentIndex - startIndex == 1) throw new SpaceBetweenBracketsException(tokenInfos[startIndex].Position);
-            
-            return (tokenInfos.GetRange(startIndex + 1, currentIndex - startIndex - 1), currentIndex);
+                if (token.TokenName == "(") bracketCounter++;
+                if (token.TokenName == ")") bracketCounter--;
+
+                if (bracketCounter == 0) break;
+            }
+            if (bracketCounter != 0)
+                throw new CloseBracketNotFoundException(tokenInfos[startIndex].Position);
+            return currentIndex;
         }
     }
 }

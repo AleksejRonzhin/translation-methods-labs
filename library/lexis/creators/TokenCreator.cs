@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using library.tokens;
+using System.Text;
 
-namespace library.tokens.creators
+namespace library.lexis.creators
 {
     abstract class TokenCreator
     {

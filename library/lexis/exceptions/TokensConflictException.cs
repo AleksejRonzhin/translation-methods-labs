@@ -1,4 +1,6 @@
-﻿namespace library.tokens.exceptions
+﻿using library.tokens;
+
+namespace library.lexis.exceptions
 {
     internal class TokensConflictException : Exception
     {

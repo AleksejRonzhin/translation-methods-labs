@@ -1,6 +1,6 @@
-﻿using library.tokens;
-using library.tokens.creators;
-using library.tokens.exceptions;
+﻿using library.lexis.creators;
+using library.lexis.exceptions;
+using library.tokens;
 
 namespace library.lexis
 {

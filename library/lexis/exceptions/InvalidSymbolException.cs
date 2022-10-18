@@ -1,4 +1,4 @@
-﻿namespace library.tokens.exceptions
+﻿namespace library.lexis.exceptions
 {
     internal class InvalidSymbolException : Exception
     {
