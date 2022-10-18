@@ -2,13 +2,13 @@
 {
     internal class TokensConflictException : Exception
     {
-        public TokensConflictException(Token firstToken, Token secondToken)
+        public TokensConflictException(TokenInfo firstToken, TokenInfo secondToken)
         {
             FirstToken = firstToken;
             SecondToken = secondToken;
         }
 
-        public Token FirstToken { get; }
-        public Token SecondToken { get; }
+        public TokenInfo FirstToken { get; }
+        public TokenInfo SecondToken { get; }
     }
 }

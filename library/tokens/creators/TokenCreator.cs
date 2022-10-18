@@ -30,11 +30,11 @@ namespace library.tokens.creators
             return true;
         }
 
-        protected Token CreateToken(string tokenName, string text, TokenType type, int? attributeValue = null)
+        protected TokenInfo Create(Token token, string text)
         {
-            return new Token(_position, tokenName, text, type, attributeValue);
+            return new(token, _position, text);
         }
 
-        abstract public Token GetToken();
+        abstract public TokenInfo GetToken();
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace library.tokens
+﻿namespace library.tokens.creators
 {
-    public class TokenChecker
+    internal class TokenChecker
     {
         public Predicate<char> StartSymbolPredicate { get; }
         public Predicate<char> SymbolPredicate { get; }

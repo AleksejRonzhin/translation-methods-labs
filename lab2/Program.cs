@@ -3,6 +3,7 @@ using library;
 using library.exceptions;
 using library.lexis;
 using library.syntax;
+using library.syntax.exceptions;
 using library.tokens;
 using library.tokens.exceptions;
 
@@ -13,7 +14,7 @@ try
     
     using (TextReader inputTextReader = new StreamReader(inputFilename))
     {
-        (List<Token> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
+        (List<TokenInfo> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
         tokens.ForEach(token => Console.WriteLine(token));
         
         switch (mode)
@@ -46,6 +47,10 @@ catch (LexicalAnalyzerException ex)
 {
     Console.WriteLine($"Лексическая ошибка в позиции {ex.Position}! {ex.Text}");
 }
+catch(SyntaxAnalyzerException ex)
+{
+    Console.WriteLine($"Синтаксическая ошибка в позиции {ex.Position}! {ex.Text}");
+}
 catch (ValidationException ex)
 {
     Console.WriteLine("Неправильное значение параметра.\n" + ex.ValidationMessage);
@@ -64,7 +69,7 @@ void WriteSymbolsTable(string symbolsTableFilename, SymbolsTable table)
     }
 }
 
-void WriteTokens(string tokensFilename, List<Token> tokens)
+void WriteTokens(string tokensFilename, List<TokenInfo> tokens)
 {
     using (var writer = new StreamWriter(tokensFilename, false))
     {

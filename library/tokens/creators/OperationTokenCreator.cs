@@ -6,7 +6,7 @@
         public static readonly Dictionary<string, string> operations = new(){
             {"+", "операция сложения" },
             {"-", "операция вычитания"},
-            {"*", "операция умножение"},
+            {"*", "операция умножения"},
             {"/", "операция деления"},
             {"=", "операция присваивания" }
         };
@@ -15,16 +15,15 @@
         {
         }
 
-        public override Token GetToken()
+        public override TokenInfo GetToken()
         {
             string tokenName = this.tokenNameBuilder.ToString();
             string text = operations[tokenName];
-            return CreateToken(tokenName, text, TokenType.OPERATION_TOKEN);
+            return Create(new OperationToken(tokenName), text);
         }
 
         private class OperationTokenChecker : TokenChecker
         {
-
             public OperationTokenChecker() : base(
                 (symbol) => operationSymbols.Contains(symbol),
                 (symbol) => false)

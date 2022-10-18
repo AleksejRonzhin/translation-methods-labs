@@ -18,13 +18,13 @@ namespace library.tokens.creators
             }
         }
 
-        public override Token GetToken()
+        public override TokenInfo GetToken()
         {
             var tokenName = this.tokenNameBuilder.ToString();
             var pointCount = tokenName.Split('.').Length - 1;
             if (pointCount > 1) throw new InvalidConstantException(tokenName);
             var text = (pointCount == 1) ? "константа вещественного числа" : "константа целого числа";
-            return CreateToken(tokenName, text, TokenType.CONSTANT_TOKEN);
+            return Create(new ConstantToken(tokenName), text);
         }
     }
 }

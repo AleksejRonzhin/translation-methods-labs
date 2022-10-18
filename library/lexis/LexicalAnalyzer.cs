@@ -6,10 +6,10 @@ namespace library.lexis
 {
     public class LexicalAnalyzer
     {
-        public static (List<Token> tokens,  SymbolsTable table) Analyze(TextReader textReader)
+        public static (List<TokenInfo> tokens,  SymbolsTable table) Analyze(TextReader textReader)
         {
             var reader = new PositionTextReader(textReader);
-            List<Token> tokens = new();
+            List<TokenInfo> tokens = new();
             SymbolsTable symbolsTable = new();
             List<TokenCreator> creatorList = new()
             {
@@ -20,8 +20,8 @@ namespace library.lexis
             };
 
             (int position, char symbol, bool isLast) = reader.Read();
-            Token? lastToken = null;
-            Token? token = null;
+            TokenInfo? lastToken = null;
+            TokenInfo? token = null;
             try
             {
                 while (!isLast)
@@ -35,6 +35,7 @@ namespace library.lexis
                             {
                                 (position, symbol, isLast) = reader.Read();
                             } while (!isLast && creator.AddSymbol(symbol));
+
                             token = creator.GetToken();
                             CheckTokensConflict(token, lastToken);
                             tokens.Add(token);
@@ -56,7 +57,7 @@ namespace library.lexis
             catch (TokensConflictException ex)
             {
                 int conflictPosition = (token == null) ? position : token.Position;
-                throw new LexicalAnalyzerException(conflictPosition, $"Между лексемами {ex.FirstToken.TokenName} и {ex.SecondToken.TokenName} отсутствует пробел");
+                throw new LexicalAnalyzerException(conflictPosition, $"Между лексемами {ex.FirstToken.Token.TokenName} и {ex.SecondToken.Token.TokenName} отсутствует пробел");
             }
             catch (InvalidSymbolException ex)
             {
@@ -69,12 +70,11 @@ namespace library.lexis
             #endregion
         }
 
-        private static void CheckTokensConflict(Token token, Token? lastToken)
+        private static void CheckTokensConflict(TokenInfo currentTokenInfo, TokenInfo? prevTokenInfo)
         {
-            if (lastToken == null) return;
-            if (token.Type == TokenType.IDENTIFIER_TOKEN 
-                && lastToken.Type == TokenType.CONSTANT_TOKEN) 
-                throw new TokensConflictException(lastToken, token);
+            if (prevTokenInfo == null) return;
+            if (currentTokenInfo.Token is IdentifierToken && prevTokenInfo.Token is ConstantToken)
+                throw new TokensConflictException(prevTokenInfo, currentTokenInfo);
         }
     }
 }

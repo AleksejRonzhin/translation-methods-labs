@@ -9,12 +9,12 @@
             _symbolsTable = symbolsTable;
         }
 
-        public override Token GetToken()
+        public override TokenInfo GetToken()
         {
             string tokenName = this.tokenNameBuilder.ToString();
             string text = $"идентификатор с именем {tokenName}";
             int attributeValue = _symbolsTable.Add(tokenName);
-            return CreateToken(tokenName, text, TokenType.IDENTIFIER_TOKEN, attributeValue);
+            return Create(new IdentifierToken(tokenName, attributeValue), text);
         }
 
         private class IdentifierTokenChecker : TokenChecker

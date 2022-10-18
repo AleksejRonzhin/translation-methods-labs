@@ -6,16 +6,15 @@
         {
         }
 
-        public override Token GetToken()
+        public override TokenInfo GetToken()
         {
             string tokenName = this.tokenNameBuilder.ToString();
             string text = (tokenName == "(") ? "открыващая скобка" : "закрывающая скобка";
-            return CreateToken(tokenName, text, TokenType.CURLY_BRACES_TOKEN);
+            return Create(new BracketToken(tokenName), text);
         }
 
         private class CurlyBracesTokenChecker : TokenChecker
         {
-
             public CurlyBracesTokenChecker() : base(
                 (symbol) => symbol == ')' || symbol == '(',
                 (symbol) => false
