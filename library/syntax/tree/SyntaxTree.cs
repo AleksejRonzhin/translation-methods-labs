@@ -1,4 +1,4 @@
-﻿namespace library.syntax
+﻿namespace library.syntax.tree
 {
     public class SyntaxTree
     {

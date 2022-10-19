@@ -5,6 +5,7 @@ using library.lexis;
 using library.lexis.exceptions;
 using library.syntax;
 using library.syntax.exceptions;
+using library.syntax.tree;
 using library.tokens;
 
 try

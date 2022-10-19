@@ -2,8 +2,11 @@
 {
     public class OperationToken : Token
     {
-        public OperationToken(string tokenName) : base(tokenName)
+        public int Prioritet { get; }
+
+        public OperationToken(string tokenName, int prioritet) : base(tokenName)
         {
+            Prioritet = prioritet;
         }
     }
 }

@@ -1,18 +1,21 @@
 ﻿using library.syntax.exceptions;
+using library.syntax.tree;
 using library.tokens;
+using System.Collections;
 
 namespace library.syntax
 {
     public class SyntaxAnalyzer
     {
-        public static SyntaxTree Analyze(List<TokenInfo> tokens)
+        public static SyntaxTree Analyze(List<TokenInfo> tokenInfos)
         {
             try
             {
-                var tokensWithoutBrackets = TakeOutBrackets(tokens);
+                var tokensWithoutBrackets = TakeOutBrackets(tokenInfos);
                 CheckSyntax(tokensWithoutBrackets);
                 return CreateSyntaxTree(tokensWithoutBrackets);
             }
+            #region Обработка ошибок
             catch (OpenBracketNotFountException ex)
             {
                 throw new SyntaxAnalyzerException(ex.Position, "У закрывающей скобки <)> отсуствует открывающая скобка <(>.");
@@ -31,10 +34,51 @@ namespace library.syntax
             {
                 throw new SyntaxAnalyzerException(ex.Position, $"Между операндами {ex.FirstOperand} и {ex.SecondOperand} отсуствует операция.");
             }
+            #endregion
         }
 
-        private static SyntaxTree CreateSyntaxTree(List<TokenInfo> tokens)
+        private static SyntaxTree CreateSyntaxTree(List<TokenInfo> tokenInfos)
         {
+            var parentTreeNode = FindParentTreeNode(tokenInfos);
+            if(parentTreeNode != null)
+            {
+                Console.WriteLine(parentTreeNode.ToString());
+            }
+            return null;
+        }
+
+        private static SyntaxTreeNode? FindParentTreeNode(List<TokenInfo> tokenInfos)
+        {
+            if(tokenInfos.Count == 1)
+            {
+                var tokenInfo = tokenInfos.First();
+                if(tokenInfo is UnderBracketsExpression expression)
+                {
+                    return FindParentTreeNode(expression.GetTokens());
+                }
+                return new SyntaxTreeNode(tokenInfo.Token);
+            }
+            var operations = tokenInfos.FindAll(tokenInfo => tokenInfo.Token is OperationToken);
+            Console.WriteLine(operations.Count);
+            for(int i = 3; i >= 1; i--)
+            {
+                var currentOperations = operations
+                    .FindAll(operation => ((OperationToken)operation.Token).Prioritet == i);
+                Console.WriteLine(currentOperations.Count);
+                if (currentOperations.Count == 0) continue;
+                var index = tokenInfos.IndexOf(currentOperations[currentOperations.Count / 2]);
+                if (index != -1)
+                {
+                    var parentTreeNode = new SyntaxTreeNode(tokenInfos[index].Token);
+                    var leftTokens = tokenInfos.GetRange(0, index);
+                    var leftNode = FindParentTreeNode(leftTokens);
+                    if (leftNode != null) parentTreeNode.AddChild(leftNode);
+                    var rightTokens = tokenInfos.GetRange(index + 1, tokenInfos.Count - index - 1);
+                    var rightNode = FindParentTreeNode(rightTokens);
+                    if (rightNode != null) parentTreeNode.AddChild(rightNode);
+                    return parentTreeNode;
+                }
+            }
             return null;
         }
 

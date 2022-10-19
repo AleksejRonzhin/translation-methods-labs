@@ -5,12 +5,12 @@ namespace library.lexis.creators
     internal class OperationTokenCreator : TokenCreator
     {
         public static readonly List<char> operationSymbols = new() { '+', '-', '*', '/', '=' };
-        public static readonly Dictionary<string, string> operations = new(){
-            {"+", "операция сложения" },
-            {"-", "операция вычитания"},
-            {"*", "операция умножения"},
-            {"/", "операция деления"},
-            {"=", "операция присваивания" }
+        public static readonly Dictionary<string, (string, int)> operations = new(){
+            {"+", ("операция сложения", 2) },
+            {"-", ("операция вычитания", 2)},
+            {"*", ("операция умножения", 1)},
+            {"/", ("операция деления", 1)},
+            {"=", ("операция присваивания", 3) }
         };
 
         public OperationTokenCreator() : base(new OperationTokenChecker())
@@ -20,8 +20,8 @@ namespace library.lexis.creators
         public override TokenInfo GetToken()
         {
             string tokenName = this.tokenNameBuilder.ToString();
-            string text = operations[tokenName];
-            return Create(new OperationToken(tokenName), text);
+            (string text, int prioritet) = operations[tokenName];
+            return Create(new OperationToken(tokenName, prioritet), text);
         }
 
         private class OperationTokenChecker : TokenChecker
