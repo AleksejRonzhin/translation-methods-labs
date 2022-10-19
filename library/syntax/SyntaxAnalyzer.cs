@@ -1,7 +1,7 @@
 ﻿using library.syntax.exceptions;
 using library.syntax.tree;
 using library.tokens;
-using System.Collections;
+using System;
 
 namespace library.syntax
 {
@@ -40,11 +40,11 @@ namespace library.syntax
         private static SyntaxTree CreateSyntaxTree(List<TokenInfo> tokenInfos)
         {
             var parentTreeNode = FindParentTreeNode(tokenInfos);
-            if(parentTreeNode != null)
+            if(parentTreeNode == null)
             {
-                Console.WriteLine(parentTreeNode.ToString());
+                return new SyntaxTree(new SyntaxTreeNode(tokenInfos.First().Token));
             }
-            return null;
+            return new SyntaxTree(parentTreeNode);
         }
 
         private static SyntaxTreeNode? FindParentTreeNode(List<TokenInfo> tokenInfos)
@@ -69,17 +69,22 @@ namespace library.syntax
                 var index = tokenInfos.IndexOf(currentOperations[currentOperations.Count / 2]);
                 if (index != -1)
                 {
-                    var parentTreeNode = new SyntaxTreeNode(tokenInfos[index].Token);
-                    var leftTokens = tokenInfos.GetRange(0, index);
-                    var leftNode = FindParentTreeNode(leftTokens);
-                    if (leftNode != null) parentTreeNode.AddChild(leftNode);
-                    var rightTokens = tokenInfos.GetRange(index + 1, tokenInfos.Count - index - 1);
-                    var rightNode = FindParentTreeNode(rightTokens);
-                    if (rightNode != null) parentTreeNode.AddChild(rightNode);
-                    return parentTreeNode;
+                    return PullParentTreeNode(tokenInfos, index);
                 }
             }
             return null;
+        }
+
+        private static SyntaxTreeNode PullParentTreeNode(List<TokenInfo> tokenInfos, int parentIndex)
+        {
+            var parentTreeNode = new SyntaxTreeNode(tokenInfos[parentIndex].Token);
+            var leftTokens = tokenInfos.GetRange(0, parentIndex);
+            var leftNode = FindParentTreeNode(leftTokens);
+            if (leftNode != null) parentTreeNode.AddChild(leftNode);
+            var rightTokens = tokenInfos.GetRange(parentIndex + 1, tokenInfos.Count - parentIndex - 1);
+            var rightNode = FindParentTreeNode(rightTokens);
+            if (rightNode != null) parentTreeNode.AddChild(rightNode);
+            return parentTreeNode;
         }
 
         private static void CheckSyntax(List<TokenInfo> tokenInfos)

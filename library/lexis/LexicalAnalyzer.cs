@@ -1,80 +1,71 @@
-﻿using library.lexis.creators;
-using library.lexis.exceptions;
+﻿using library.lexis.exceptions;
 using library.tokens;
+using library.tokens.creation;
 
 namespace library.lexis
 {
     public class LexicalAnalyzer
     {
-        public static (List<TokenInfo> tokens,  SymbolsTable table) Analyze(TextReader textReader)
-        {
-            var reader = new PositionTextReader(textReader);
-            List<TokenInfo> tokens = new();
-            SymbolsTable symbolsTable = new();
-            List<TokenCreator> creatorList = new()
-            {
-                new IdentifierTokenCreator(symbolsTable),
-                new OperationTokenCreator(),
-                new CurlyBracesTokenCreator(),
-                new ConstantTokenCreator()
-            };
+        private static readonly List<char> separatingSymbols = new() { ' ' };
 
-            (int position, char symbol, bool isLast) = reader.Read();
-            TokenInfo? lastToken = null;
-            TokenInfo? token = null;
+        public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(TextReader textReader)
+        {
+            var helper = new LexicalAnalyzerHelper();
+
             try
             {
+                var reader = new PositionTextReader(textReader);
+                (int position, char symbol, bool isLast) = reader.Read();
                 while (!isLast)
                 {
-                    bool wasToken = false;
-                    foreach (TokenCreator creator in creatorList)
+                    var starter = helper.TryGetTokenCreationStarter(symbol);
+                    if (starter != null)
                     {
-                        if (creator.Start(symbol, position + 1))
-                        {
-                            do
-                            {
-                                (position, symbol, isLast) = reader.Read();
-                            } while (!isLast && creator.AddSymbol(symbol));
-
-                            token = creator.GetToken();
-                            CheckTokensConflict(token, lastToken);
-                            tokens.Add(token);
-
-                            lastToken = token;
-                            wasToken = true;
-                            break;
-                        }
+                        var process = starter.Start(symbol, position);
+                        TokenInfo token = GetToken(reader, ref position, ref symbol, out isLast, process);
+                        helper.AddToken(token);
+                        continue;
                     }
-                    if (wasToken) continue;
 
-                    if (symbol != ' ') throw new InvalidSymbolException(symbol);
-                    lastToken = null;
-                    (position, symbol, isLast) = reader.Read();
+                    TryMoveToNextSymbol(helper, reader, ref position, ref symbol, out isLast);
                 }
-                return (tokens, symbolsTable);
+                return helper.GetInfo();
             }
             #region Обработка ошибок
             catch (TokensConflictException ex)
             {
-                int conflictPosition = (token == null) ? position : token.Position;
-                throw new LexicalAnalyzerException(conflictPosition, $"Между лексемами {ex.FirstToken.Token.TokenName} и {ex.SecondToken.Token.TokenName} отсутствует пробел");
+                throw new LexicalAnalyzerException(ex.Position, $"Между лексемами {ex.FirstToken.Token.TokenName} и {ex.SecondToken.Token.TokenName} отсутствует пробел");
             }
             catch (InvalidSymbolException ex)
             {
-                throw new LexicalAnalyzerException(position, $"Встречен недопустимый символ {ex.Symbol}");
+                throw new LexicalAnalyzerException(ex.Position, $"Встречен недопустимый символ {ex.Symbol}");
             }
             catch (InvalidConstantException ex)
             {
-                throw new LexicalAnalyzerException(position, $"Неправильно задана константа {ex.Constant}");
+                throw new LexicalAnalyzerException(ex.Position, $"Неправильно задана константа {ex.Constant}");
             }
             #endregion
         }
 
-        private static void CheckTokensConflict(TokenInfo currentTokenInfo, TokenInfo? prevTokenInfo)
+        private static TokenInfo GetToken(PositionTextReader reader, ref int position,
+            ref char symbol, out bool isLast, TokenCreationProcess process)
         {
-            if (prevTokenInfo == null) return;
-            if (currentTokenInfo.Token is IdentifierToken && prevTokenInfo.Token is ConstantToken)
-                throw new TokensConflictException(prevTokenInfo, currentTokenInfo);
+            do
+            {
+                (position, symbol, isLast) = reader.Read();
+            } while (process.AddSymbol(symbol));
+            return process.Finish();
+        }
+
+        private static void TryMoveToNextSymbol(LexicalAnalyzerHelper helper, PositionTextReader reader, 
+            ref int position, ref char symbol, out bool isLast)
+        {
+            if (separatingSymbols.Contains(symbol))
+            {
+                helper.RefreshPrevTokenInfo();
+                (position, symbol, isLast) = reader.Read();
+            }
+            else throw new InvalidSymbolException(symbol, position);
         }
     }
 }

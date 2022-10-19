@@ -12,27 +12,26 @@ try
 {
     var mode = new ModeParameter(TakeArgOrThrow(0, "режим")).GetValue();
     var inputFilename = new InputFilenameParameter(TakeArgOrThrow(1, "файл исходного выражения")).GetValue();
-    
-    using (TextReader inputTextReader = new StreamReader(inputFilename))
+
+    using TextReader inputTextReader = new StreamReader(inputFilename);
+    (List<TokenInfo> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
+    tokens.ForEach(token => Console.WriteLine(token));
+
+    switch (mode)
     {
-        (List<TokenInfo> tokens, SymbolsTable table) = LexicalAnalyzer.Analyze(inputTextReader);
-        //tokens.ForEach(token => Console.WriteLine(token));
-        
-        switch (mode)
-        {
-            case "LEX":
-            case "lex":
-                var tokensFilename = new TokensFilenameParameter(TakeArgOrThrow(2, "файл токенов")).GetValue();
-                var symbolsTableFilename = new SymbolsTableFilenameParameter(TakeArgOrThrow(3, "файл таблицы символов")).GetValue();
-                WriteTokens(tokensFilename, tokens);
-                WriteSymbolsTable(symbolsTableFilename, table);
-                break;
-            case "SYN":
-            case "syn":
-                SyntaxTree syntaxTree = SyntaxAnalyzer.Analyze(tokens);
-                var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
-                break;
-        }
+        case "LEX":
+        case "lex":
+            var tokensFilename = new TokensFilenameParameter(TakeArgOrThrow(2, "файл токенов")).GetValue();
+            var symbolsTableFilename = new SymbolsTableFilenameParameter(TakeArgOrThrow(3, "файл таблицы символов")).GetValue();
+            WriteTokens(tokensFilename, tokens);
+            WriteSymbolsTable(symbolsTableFilename, table);
+            break;
+        case "SYN":
+        case "syn":
+            SyntaxTree syntaxTree = SyntaxAnalyzer.Analyze(tokens);
+            var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
+            WriteSyntaxTree(syntaxTreeFilename, syntaxTree);
+            break;
     }
 }
 # region Обработка ошибок
@@ -72,13 +71,18 @@ void WriteSymbolsTable(string symbolsTableFilename, SymbolsTable table)
 
 void WriteTokens(string tokensFilename, List<TokenInfo> tokens)
 {
-    using (var writer = new StreamWriter(tokensFilename, false))
+    using var writer = new StreamWriter(tokensFilename, false);
+    tokens.ForEach(token =>
     {
-        tokens.ForEach(token =>
-        {
-            writer.WriteLine(token);
-        });
-    }
+        writer.WriteLine(token);
+    });
+}
+
+void WriteSyntaxTree(string syntaxTreeFilename, SyntaxTree syntaxTree)
+{
+    using var writer = new StreamWriter(syntaxTreeFilename, false);
+    writer.Write(SyntaxTreePrinter.Print(syntaxTree));
+    Console.WriteLine(SyntaxTreePrinter.Print(syntaxTree));
 }
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")
