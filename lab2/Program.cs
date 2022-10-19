@@ -1,6 +1,6 @@
 ﻿using lab2.parameters;
 using library;
-using library.exceptions;
+using library.parameters.exceptions;
 using library.lexis;
 using library.lexis.exceptions;
 using library.syntax;
@@ -29,6 +29,7 @@ try
         case "SYN":
         case "syn":
             SyntaxTree syntaxTree = SyntaxAnalyzer.Analyze(tokens);
+            Console.WriteLine(SyntaxTreePrinter.Print(syntaxTree));
             var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
             WriteSyntaxTree(syntaxTreeFilename, syntaxTree);
             break;
@@ -82,7 +83,6 @@ void WriteSyntaxTree(string syntaxTreeFilename, SyntaxTree syntaxTree)
 {
     using var writer = new StreamWriter(syntaxTreeFilename, false);
     writer.Write(SyntaxTreePrinter.Print(syntaxTree));
-    Console.WriteLine(SyntaxTreePrinter.Print(syntaxTree));
 }
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")

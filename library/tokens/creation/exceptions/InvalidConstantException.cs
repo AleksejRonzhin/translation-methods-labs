@@ -1,4 +1,4 @@
-﻿namespace library.lexis.exceptions
+﻿namespace library.tokens.creation.exceptions
 {
     internal class InvalidConstantException : Exception
     {

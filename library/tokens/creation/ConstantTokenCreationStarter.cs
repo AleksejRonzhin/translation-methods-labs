@@ -1,4 +1,4 @@
-﻿using library.lexis.exceptions;
+﻿using library.tokens.creation.exceptions;
 
 namespace library.tokens.creation
 {

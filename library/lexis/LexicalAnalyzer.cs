@@ -1,6 +1,7 @@
 ﻿using library.lexis.exceptions;
 using library.tokens;
 using library.tokens.creation;
+using library.tokens.creation.exceptions;
 
 namespace library.lexis
 {
@@ -43,6 +44,10 @@ namespace library.lexis
             catch (InvalidConstantException ex)
             {
                 throw new LexicalAnalyzerException(ex.Position, $"Неправильно задана константа {ex.Constant}");
+            }
+            catch (OperationNotFoundException ex)
+            {
+                throw new LexicalAnalyzerException(ex.Position, $"Операция {ex.Lexeme} не найдена.");
             }
             #endregion
         }

@@ -13,7 +13,7 @@ namespace library.syntax
             {
                 var tokensWithoutBrackets = TakeOutBrackets(tokenInfos);
                 CheckSyntax(tokensWithoutBrackets);
-                return CreateSyntaxTree(tokensWithoutBrackets);
+                return SyntaxTreeCreator.Create(tokensWithoutBrackets);
             }
             #region Обработка ошибок
             catch (OpenBracketNotFountException ex)
@@ -35,56 +35,6 @@ namespace library.syntax
                 throw new SyntaxAnalyzerException(ex.Position, $"Между операндами {ex.FirstOperand} и {ex.SecondOperand} отсуствует операция.");
             }
             #endregion
-        }
-
-        private static SyntaxTree CreateSyntaxTree(List<TokenInfo> tokenInfos)
-        {
-            var parentTreeNode = FindParentTreeNode(tokenInfos);
-            if(parentTreeNode == null)
-            {
-                return new SyntaxTree(new SyntaxTreeNode(tokenInfos.First().Token));
-            }
-            return new SyntaxTree(parentTreeNode);
-        }
-
-        private static SyntaxTreeNode? FindParentTreeNode(List<TokenInfo> tokenInfos)
-        {
-            if(tokenInfos.Count == 1)
-            {
-                var tokenInfo = tokenInfos.First();
-                if(tokenInfo is UnderBracketsExpression expression)
-                {
-                    return FindParentTreeNode(expression.GetTokens());
-                }
-                return new SyntaxTreeNode(tokenInfo.Token);
-            }
-            var operations = tokenInfos.FindAll(tokenInfo => tokenInfo.Token is OperationToken);
-            Console.WriteLine(operations.Count);
-            for(int i = 3; i >= 1; i--)
-            {
-                var currentOperations = operations
-                    .FindAll(operation => ((OperationToken)operation.Token).Prioritet == i);
-                Console.WriteLine(currentOperations.Count);
-                if (currentOperations.Count == 0) continue;
-                var index = tokenInfos.IndexOf(currentOperations[currentOperations.Count / 2]);
-                if (index != -1)
-                {
-                    return PullParentTreeNode(tokenInfos, index);
-                }
-            }
-            return null;
-        }
-
-        private static SyntaxTreeNode PullParentTreeNode(List<TokenInfo> tokenInfos, int parentIndex)
-        {
-            var parentTreeNode = new SyntaxTreeNode(tokenInfos[parentIndex].Token);
-            var leftTokens = tokenInfos.GetRange(0, parentIndex);
-            var leftNode = FindParentTreeNode(leftTokens);
-            if (leftNode != null) parentTreeNode.AddChild(leftNode);
-            var rightTokens = tokenInfos.GetRange(parentIndex + 1, tokenInfos.Count - parentIndex - 1);
-            var rightNode = FindParentTreeNode(rightTokens);
-            if (rightNode != null) parentTreeNode.AddChild(rightNode);
-            return parentTreeNode;
         }
 
         private static void CheckSyntax(List<TokenInfo> tokenInfos)

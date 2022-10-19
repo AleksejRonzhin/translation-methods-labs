@@ -1,5 +1,5 @@
-﻿using library.exceptions;
-using library.parameters;
+﻿using library.parameters;
+using library.parameters.exceptions;
 using library.parameters.mappers;
 using library.parameters.validators;
 

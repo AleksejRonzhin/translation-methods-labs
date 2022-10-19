@@ -1,12 +1,14 @@
-﻿namespace library.tokens
+﻿using library.operations;
+
+namespace library.tokens
 {
     public class OperationToken : Token
     {
-        public int Prioritet { get; }
+        public Operation Operation { get; }
 
-        public OperationToken(string tokenName, int prioritet) : base(tokenName)
+        public OperationToken(Operation operation) : base(operation.Sign)
         {
-            Prioritet = prioritet;
+            Operation = operation;
         }
     }
 }

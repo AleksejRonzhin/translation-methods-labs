@@ -1,17 +1,14 @@
-﻿namespace library.tokens.creation
+﻿using library.operations;
+using library.tokens.creation.exceptions;
+
+namespace library.tokens.creation
 {
     internal class OperationTokenCreationStarter : TokenCreationStarter
     {
-        public static readonly List<char> operationSymbols = new() { '+', '-', '*', '/', '=' };
-        public static readonly Dictionary<string, (string, int)> operations = new(){
-            {"+", ("операция сложения", 2) },
-            {"-", ("операция вычитания", 2)},
-            {"*", ("операция умножения", 1)},
-            {"/", ("операция деления", 1)},
-            {"=", ("операция присваивания", 3) }
-        };
-        private static readonly Predicate<char> startPredicate = (symbol) => operationSymbols.Contains(symbol);
-        private static readonly Predicate<char> predicate = (symbol) => false;
+        private static readonly Predicate<char> startPredicate 
+            = (symbol) => Operation.ValidSymbols.Contains(symbol);
+        private static readonly Predicate<char> predicate 
+            = (symbol) => Operation.ValidSymbols.Contains(symbol);
 
 
         public OperationTokenCreationStarter() 
@@ -34,8 +31,9 @@
             public override TokenInfo Finish()
             {
                 string lexeme = GetLexeme();
-                (string text, int prioritet) = operations[lexeme];
-                return CreateTokenInfo(new OperationToken(lexeme, prioritet), text);
+                var operation = Operation.Operations.Find(operation => operation.Sign == lexeme);
+                if (operation == null) throw new OperationNotFoundException(lexeme, startPosition);
+                return CreateTokenInfo(new OperationToken(operation), operation.Name);
             }
         }
     }

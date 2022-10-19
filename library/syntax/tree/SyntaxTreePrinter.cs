@@ -6,6 +6,7 @@ namespace library.syntax.tree
     {
         public static string Print(SyntaxTree syntaxTree)
         {
+            if (syntaxTree == SyntaxTree.Empty) return String.Empty;
             return PrintNode(syntaxTree.HeadNode);
         }
 
