@@ -7,9 +7,9 @@
         public static List<Operation> Operations { get; } = new()
         {
             new Operation("+", "операция сложения", true, true, 2),
-            new Operation("-", "операция вычитания", true, true, 2),
+            new Operation("-", "операция вычитания", false, true, 2),
             new Operation("*", "операция умножения", true, true, 3),
-            new Operation("/", "операция деления", true, true, 3),
+            new Operation("/", "операция деления", false, true, 3),
             new Operation("=", "операция присваивания", false, false, 1)
         };
 

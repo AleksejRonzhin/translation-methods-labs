@@ -12,10 +12,9 @@ namespace library.lexis
         public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(TextReader textReader)
         {
             var helper = new LexicalAnalyzerHelper();
-
-            try
+            var reader = new PositionTextReader(textReader);
+            return WrapLexicalExceptions(() =>
             {
-                var reader = new PositionTextReader(textReader);
                 (int position, char symbol, bool isLast) = reader.Read();
                 while (!isLast)
                 {
@@ -28,9 +27,45 @@ namespace library.lexis
                         continue;
                     }
 
-                    CheckSymbolAndTryMoveToNextSymbol(helper, reader, ref position, ref symbol, out isLast);
+                    CheckSymbolCorrectness(position, symbol);
+                    helper.RefreshPrevTokenInfo();
+                    (position, symbol, isLast) = reader.Read();
                 }
                 return helper.GetInfo();
+            });
+        }
+
+        public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(string text)
+        {
+            var helper = new LexicalAnalyzerHelper();
+
+            return WrapLexicalExceptions(() =>
+            {
+                var i = 0;
+                while (i < text.Length)
+                {
+                    var starter = helper.TryGetTokenCreationStarter(text[i]);
+                    if (starter != null)
+                    {
+                        var process = starter.Start(text[i], i);
+                        TokenInfo token = PullToken(text, ref i, process);
+                        helper.AddToken(token);
+                        continue;
+                    }
+
+                    CheckSymbolCorrectness(text, i);
+                    helper.RefreshPrevTokenInfo();
+                    i++;
+                }
+                return helper.GetInfo();
+            });
+        }
+
+        private static T WrapLexicalExceptions<T>(Func<T> lambda)
+        {
+            try
+            {
+                return lambda.Invoke();
             }
             #region Обработка ошибок
             catch (TokensConflictException ex)
@@ -53,7 +88,7 @@ namespace library.lexis
         }
 
         private static TokenInfo GetToken(PositionTextReader reader, ref int position,
-            ref char symbol, out bool isLast, TokenCreationProcess process)
+                    ref char symbol, out bool isLast, TokenCreationProcess process)
         {
             do
             {
@@ -62,20 +97,23 @@ namespace library.lexis
             return process.Finish();
         }
 
-        private static void CheckSymbolAndTryMoveToNextSymbol(LexicalAnalyzerHelper helper, PositionTextReader reader, 
-            ref int position, ref char symbol, out bool isLast)
+        private static TokenInfo PullToken(string text, ref int i, TokenCreationProcess process)
         {
-            if (separatingSymbols.Contains(symbol))
+            do
             {
-                helper.RefreshPrevTokenInfo();
-                (position, symbol, isLast) = reader.Read();
-            }
-            else throw new InvalidSymbolException(symbol, position);
+                i++;
+            } while (i < text.Length && process.AddSymbol(text[i]));
+            return process.Finish();
         }
 
-        public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(string text)
+        private static void CheckSymbolCorrectness(string text, int i)
         {
-            throw new NotImplementedException();
+            CheckSymbolCorrectness(i, text[i]);
+        }
+
+        private static void CheckSymbolCorrectness(int position, char symbol)
+        {
+            if (!separatingSymbols.Contains(symbol)) throw new InvalidSymbolException(symbol, position);
         }
     }
 }
