@@ -28,7 +28,7 @@ namespace library.lexis
                         continue;
                     }
 
-                    TryMoveToNextSymbol(helper, reader, ref position, ref symbol, out isLast);
+                    CheckSymbolAndTryMoveToNextSymbol(helper, reader, ref position, ref symbol, out isLast);
                 }
                 return helper.GetInfo();
             }
@@ -62,7 +62,7 @@ namespace library.lexis
             return process.Finish();
         }
 
-        private static void TryMoveToNextSymbol(LexicalAnalyzerHelper helper, PositionTextReader reader, 
+        private static void CheckSymbolAndTryMoveToNextSymbol(LexicalAnalyzerHelper helper, PositionTextReader reader, 
             ref int position, ref char symbol, out bool isLast)
         {
             if (separatingSymbols.Contains(symbol))
@@ -71,6 +71,11 @@ namespace library.lexis
                 (position, symbol, isLast) = reader.Read();
             }
             else throw new InvalidSymbolException(symbol, position);
+        }
+
+        public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(string text)
+        {
+            throw new NotImplementedException();
         }
     }
 }
