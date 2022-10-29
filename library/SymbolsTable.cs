@@ -1,4 +1,6 @@
-﻿namespace library
+﻿using System.Text;
+
+namespace library
 {
     public class SymbolsTable
     {
@@ -15,6 +17,16 @@
             int id = Symbols.Count + 1;
             Symbols.Add(symbol, id);
             return id;
+        }
+
+        public override string ToString()
+        {
+            StringBuilder stringBuilder = new();
+            foreach (KeyValuePair<string, int> entry in Symbols)
+            {
+                stringBuilder.AppendLine($"{entry.Value} - {entry.Key}");
+            }
+            return stringBuilder.ToString();
         }
     }
 }

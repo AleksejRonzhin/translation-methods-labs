@@ -9,9 +9,9 @@ namespace library.lexis
     {
         private static readonly List<char> separatingSymbols = new() { ' ' };
 
-        public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(TextReader textReader)
+        public static List<TokenInfo> Analyze(TextReader textReader, SymbolsTable symbolsTable)
         {
-            var helper = new LexicalAnalyzerHelper();
+            var helper = new LexicalAnalyzerHelper(symbolsTable);
             var reader = new PositionTextReader(textReader);
             return WrapLexicalExceptions(() =>
             {
@@ -31,13 +31,13 @@ namespace library.lexis
                     helper.RefreshPrevTokenInfo();
                     (position, symbol, isLast) = reader.Read();
                 }
-                return helper.GetInfo();
+                return helper.GetTokens();
             });
         }
 
-        public static (List<TokenInfo> tokens, SymbolsTable table) Analyze(string text)
+        public static List<TokenInfo> Analyze(string text, SymbolsTable symbolsTable)
         {
-            var helper = new LexicalAnalyzerHelper();
+            var helper = new LexicalAnalyzerHelper(symbolsTable);
 
             return WrapLexicalExceptions(() =>
             {
@@ -57,7 +57,7 @@ namespace library.lexis
                     helper.RefreshPrevTokenInfo();
                     i++;
                 }
-                return helper.GetInfo();
+                return helper.GetTokens();
             });
         }
 

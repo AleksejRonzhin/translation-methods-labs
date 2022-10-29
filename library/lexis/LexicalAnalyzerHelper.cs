@@ -6,9 +6,15 @@ namespace library.lexis
 {
     internal class LexicalAnalyzerHelper
     {
-        private readonly SymbolsTable symbolsTable = new ();
+        private readonly SymbolsTable symbolsTable;
         private readonly List<TokenInfo> tokens = new();
         private TokenInfo? prevTokenInfo = null;
+
+        public LexicalAnalyzerHelper(SymbolsTable symbolsTable)
+        {
+            this.symbolsTable = symbolsTable;
+        }
+
 
         internal TokenCreationStarter? TryGetTokenCreationStarter(char symbol)
         {
@@ -47,9 +53,9 @@ namespace library.lexis
             prevTokenInfo = null;
         }
 
-        internal (List<TokenInfo> tokens, SymbolsTable table) GetInfo()
+        internal List<TokenInfo> GetTokens()
         {
-            return (tokens, symbolsTable);
+            return tokens;
         }
     }
 }
