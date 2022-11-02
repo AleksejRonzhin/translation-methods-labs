@@ -1,4 +1,5 @@
-﻿using library.syntax.tree;
+﻿using library.symbols;
+using library.syntax.tree;
 using library.tokens;
 
 namespace library.stages
@@ -38,7 +39,7 @@ namespace library.stages
         {
             lexicalStage = new(new LexicalAnalyzerStage(textReader, symbolsTable, lexicalAnalyzerAction ?? emptyLexicalAnalyzerAction));
             syntaxStage = new Lazy<SyntaxAnalyzerStage>(new SyntaxAnalyzerStage(lexicalStage.Value, syntaxAnalyzerAction ?? emptySyntaxAnalyzerAction));
-            semanticStage = new Lazy<SemanticAnalyzerStage>(new SemanticAnalyzerStage(syntaxStage.Value, semanticAnalyzerAction ?? emptySemanticAnalyzerAction));
+            semanticStage = new Lazy<SemanticAnalyzerStage>(new SemanticAnalyzerStage(syntaxStage.Value, semanticAnalyzerAction ?? emptySemanticAnalyzerAction, symbolsTable));
         }
     }
 }

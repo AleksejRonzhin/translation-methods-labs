@@ -1,4 +1,5 @@
-﻿using library.syntax.tree;
+﻿using library.symbols;
+using library.syntax.tree;
 using library.tokens;
 
 namespace library.stages

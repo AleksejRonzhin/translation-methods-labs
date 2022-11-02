@@ -1,4 +1,5 @@
 ﻿using library.lexis.exceptions;
+using library.symbols;
 using library.tokens;
 using library.tokens.creation;
 

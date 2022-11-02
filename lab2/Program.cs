@@ -1,13 +1,12 @@
 ﻿using lab2.parameters;
-using library;
 using library.lexis.exceptions;
 using library.output;
 using library.parameters.exceptions;
 using library.stages;
+using library.symbols;
 using library.syntax.exceptions;
 using library.syntax.tree;
 using library.tokens;
-
 
 SymbolsTable symbolsTable = new();
 
@@ -15,16 +14,14 @@ try
 {
     var mode = new ModeParameter(TakeArgOrThrow(0, "режим")).GetValue();
     var inputFilename = new InputFilenameParameter(TakeArgOrThrow(1, "файл исходного выражения")).GetValue();
-
-    
     using TextReader inputTextReader = new StreamReader(inputFilename);
-    StageCreator stageManagerPreparer = new(inputTextReader, symbolsTable);
+    StageCreator stageCreator = new(inputTextReader, symbolsTable);
 
     IStage stage = mode switch
     {
-        "LEX" or "lex" => stageManagerPreparer.CreateLexicalAnalyzerStage(LexicalAnalyzerAction),
-        "SYN" or "syn" => stageManagerPreparer.CreateSyntaxAnalyzerStage(SyntaxAnalyzerAction),
-        "SEM" or "sem" => stageManagerPreparer.CreateSemanticAnalyzerStage(SemanticAnalyzerAction),
+        "LEX" or "lex" => stageCreator.CreateLexicalAnalyzerStage(LexicalAnalyzerAction),
+        "SYN" or "syn" => stageCreator.CreateSyntaxAnalyzerStage(SyntaxAnalyzerAction),
+        "SEM" or "sem" => stageCreator.CreateSemanticAnalyzerStage(SemanticAnalyzerAction),
         _ => throw new Exception()
     };
     stage.Execute();
@@ -67,10 +64,10 @@ void SyntaxAnalyzerAction(SyntaxTree syntaxTree)
     SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, syntaxTree);
 }
 
-void SemanticAnalyzerAction(SyntaxTree syntaxTree)
+void SemanticAnalyzerAction(SyntaxTree modeSyntaxTree)
 {
     var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
-    SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, syntaxTree);
+    SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, modeSyntaxTree);
 }
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")
