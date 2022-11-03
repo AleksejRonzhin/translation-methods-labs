@@ -1,6 +1,7 @@
 ﻿using library.lexis;
 using library.symbols;
 using library.tokens;
+using System.Diagnostics;
 
 namespace library.stages
 {

@@ -12,6 +12,7 @@ namespace library.syntax
             CheckFirstToken(tokenInfos.First());
             CheckLastToken(tokenInfos.Last());
             TokenInfo currentTokenInfo = tokenInfos.First();
+
             for (int i = 1; i < tokenInfos.Count; i++)
             {
                 TokenInfo nextTokenInfo = tokenInfos[i];

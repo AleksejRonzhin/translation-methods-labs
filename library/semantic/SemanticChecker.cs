@@ -1,7 +1,6 @@
 ﻿using library.semantic.exceptions;
 using library.syntax.tree;
 using library.tokens;
-using library.tree;
 
 namespace library.semantic
 {
@@ -18,16 +17,16 @@ namespace library.semantic
             CheckDivisionByZeroNode(headNode);
         }
 
-        private static void CheckDivisionByZeroNode(TreeNode<Token> node)
+        private static void CheckDivisionByZeroNode(SyntaxTreeNode node)
         {
-            if (node.Value is OperationToken operationToken)
+            if (node.Value.Token is OperationToken operationToken)
             {
                 if (operationToken.Operation.Sign == "/")
                 {
                     var divider = node.Children[1];
-                    if (divider.Value is ConstantToken)
+                    if (divider.Value.Token is ConstantToken)
                     {
-                        if (Convert.ToDouble(divider.Value.TokenName, System.Globalization.CultureInfo.InvariantCulture) == 0)
+                        if (Convert.ToDouble(divider.Value.Token.TokenName, System.Globalization.CultureInfo.InvariantCulture) == 0)
                         {
                             throw new DivisionByZeroException(divider.Value);
                         }

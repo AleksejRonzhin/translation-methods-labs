@@ -5,8 +5,7 @@ namespace library.tokens.creation
     internal class ConstantTokenCreationStarter : TokenCreationStarter
     {
         private static readonly Predicate<char> StartPredicate = (symbol) => symbol >= '0' && symbol <= '9';
-        private static readonly Predicate<char> Predicate = (symbol) => symbol >= '0' && symbol <= '9' || symbol == '.';
-
+        private static readonly Predicate<char> Predicate = (symbol) => symbol >= '0' && symbol <= '9' || symbol == '.'; 
         public ConstantTokenCreationStarter()
             : base(StartPredicate)
         {

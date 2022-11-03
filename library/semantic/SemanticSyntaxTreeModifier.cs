@@ -1,7 +1,6 @@
 ﻿using library.symbols;
 using library.syntax.tree;
 using library.tokens;
-using library.tree;
 
 namespace library.semantic
 {
@@ -17,14 +16,14 @@ namespace library.semantic
         public SyntaxTree Modify(SyntaxTree syntaxTree)
         {
             var headNode = syntaxTree.HeadNode;
-            if (headNode.Value is OperationToken)
+            if (headNode.Value.Token is OperationToken)
             {
                 _ = GetOperationResultType(headNode);
             }
             return syntaxTree;
         }
 
-        private OperandType GetOperationResultType(TreeNode<Token> node)
+        private OperandType GetOperationResultType(SyntaxTreeNode node)
         {
             var operandTypes = GetOperandsTypes(node.Children);
             var requiredType = GetPrioritetType(operandTypes);
@@ -32,16 +31,16 @@ namespace library.semantic
             return requiredType;
         }
 
-        private HashSet<OperandType> GetOperandsTypes(List<TreeNode<Token>> children)
+        private HashSet<OperandType> GetOperandsTypes(List<SyntaxTreeNode> children)
         {
             var operandTypes = new HashSet<OperandType>();
             children.ForEach(child => operandTypes.Add(GetOperandTypeNode(child)));
             return operandTypes;
         }
 
-        private OperandType GetOperandTypeNode(TreeNode<Token> node)
+        private OperandType GetOperandTypeNode(SyntaxTreeNode node)
         {
-            var token = node.Value;
+            var token = node.Value.Token;
             if (token is IdentifierToken identifierToken)
             {
                 var index = identifierToken.AttributeValue;
@@ -70,14 +69,14 @@ namespace library.semantic
             return OperandType.REAL;
         }
 
-        private void CastChildren(TreeNode<Token> node, OperandType requiredType)
+        private void CastChildren(SyntaxTreeNode node, OperandType requiredType)
         {
-            List<(TreeNode<Token> oldNode, TreeNode<Token> newNode)> replacePairs = new();
+            List<(SyntaxTreeNode oldNode, SyntaxTreeNode newNode)> replacePairs = new();
             node.Children.ForEach(child =>
             {
                 if (GetOperandTypeNode(child) != requiredType)
                 {
-                    var castNode = new TreeNode<Token>(new CastIntToRealFunctionToken());
+                    var castNode = new SyntaxTreeNode(new TokenInfo(new CastIntToRealFunctionToken(), 0, ""));
                     castNode.AddChild(child);
                     replacePairs.Add((child, castNode));
                 }

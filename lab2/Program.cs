@@ -25,6 +25,7 @@ try
         _ => throw new Exception()
     };
     stage.Execute();
+
 }
 #region Обработка ошибок
 catch (ParameterNotFoundException ex)
@@ -34,6 +35,10 @@ catch (ParameterNotFoundException ex)
 catch (FileNotFoundException)
 {
     Console.WriteLine("Файл не найден");
+}
+catch (ValidationException ex)
+{
+    Console.WriteLine("Неправильное значение параметра.\n" + ex.ValidationMessage);
 }
 catch (LexicalAnalyzerException ex)
 {
@@ -45,11 +50,7 @@ catch (SyntaxAnalyzerException ex)
 }
 catch (SemanticAnalyzerException ex)
 {
-    Console.WriteLine($"Cемантическая ошибка! {ex.Text}");
-}
-catch (ValidationException ex)
-{
-    Console.WriteLine("Неправильное значение параметра.\n" + ex.ValidationMessage);
+    Console.WriteLine($"Cемантическая ошибка в позиции {ex.Position}! {ex.Text}");
 }
 #endregion
 

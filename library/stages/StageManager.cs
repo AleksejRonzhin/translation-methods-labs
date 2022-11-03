@@ -10,7 +10,6 @@ namespace library.stages
         private static readonly Action<SyntaxTree> emptySyntaxAnalyzerAction = tree => { };
         private static readonly Action<SyntaxTree> emptySemanticAnalyzerAction = tree => { };
 
-
         private readonly Lazy<LexicalAnalyzerStage> lexicalStage;
         private readonly Lazy<SyntaxAnalyzerStage> syntaxStage;
         private readonly Lazy<SemanticAnalyzerStage> semanticStage;

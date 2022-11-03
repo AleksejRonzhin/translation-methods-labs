@@ -7,15 +7,16 @@ namespace library.semantic
     public class SemanticAnalyzer
     {
         public static SyntaxTree Analyze(SyntaxTree syntaxTree, SymbolsTable symbolsTable)
-        {
+        {        
             try
             {
                 SemanticChecker.CheckSemanticErrors(syntaxTree);
                 return new SemanticSyntaxTreeModifier(symbolsTable).Modify(syntaxTree);
             }
-            catch (DivisionByZeroException)
+            
+            catch (DivisionByZeroException ex)
             {
-                throw new SemanticAnalyzerException(0, "Деление на ноль.");
+                throw new SemanticAnalyzerException(ex.TokenInfo.Position, "Деление на ноль.");
             }
         }
     }

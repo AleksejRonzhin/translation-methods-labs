@@ -1,5 +1,4 @@
 ﻿using library.tokens;
-using library.tree;
 using System.Text;
 
 namespace library.syntax.tree
@@ -12,7 +11,7 @@ namespace library.syntax.tree
             return PrintNode(syntaxTree.HeadNode);
         }
 
-        private static string PrintNode(TreeNode<Token> node, int pledge = 0)
+        private static string PrintNode(SyntaxTreeNode node, int pledge = 0)
         {
             StringBuilder stringBuilder = new(node.Value.ToString());
             node.Children.ForEach(child =>

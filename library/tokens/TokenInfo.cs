@@ -2,7 +2,7 @@
 {
     public class TokenInfo
     {
-
+        public static TokenInfo Empty = new(Token.Empty, -1, "");
         public TokenInfo(Token token, int position, string text)
         {
             Position = position;

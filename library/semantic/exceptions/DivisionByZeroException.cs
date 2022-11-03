@@ -4,11 +4,11 @@ namespace library.semantic.exceptions
 {
     internal class DivisionByZeroException : Exception
     {
-        public Token token;
+        public TokenInfo TokenInfo { get; }
 
-        public DivisionByZeroException(Token token)
+        public DivisionByZeroException(TokenInfo tokenInfo)
         {
-            this.token = token;
+            this.TokenInfo = tokenInfo;
         }
     }
 }
