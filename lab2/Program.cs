@@ -1,13 +1,13 @@
 ﻿using lab2.parameters;
-using library.lexis.exceptions;
+using library.compiler.core.symbols;
+using library.compiler.core.tokens;
+using library.compiler.lexis.exceptions;
+using library.compiler.semantic.exceptions;
+using library.compiler.stages;
+using library.compiler.syntax.exceptions;
+using library.compiler.syntax.tree;
 using library.output;
 using library.parameters.exceptions;
-using library.semantic.exceptions;
-using library.stages;
-using library.symbols;
-using library.syntax.exceptions;
-using library.syntax.tree;
-using library.tokens;
 
 SymbolsTable symbolsTable = new();
 

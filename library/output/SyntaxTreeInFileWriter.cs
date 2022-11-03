@@ -1,4 +1,4 @@
-﻿using library.syntax.tree;
+﻿using library.compiler.syntax.tree;
 
 namespace library.output
 {

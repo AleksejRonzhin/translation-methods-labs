@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using library.symbols;
+using library.compiler.core.symbols;
 
 namespace library.output
 {
