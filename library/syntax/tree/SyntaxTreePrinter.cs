@@ -15,7 +15,7 @@ namespace library.syntax.tree
         private static string PrintNode(TreeNode<Token> node, int pledge = 0)
         {
             StringBuilder stringBuilder = new(node.Value.ToString());
-            node.Childrens.ForEach(child =>
+            node.Children.ForEach(child =>
             {
                 stringBuilder.Append(GetPrefix(pledge))
                 .Append(PrintNode(child, pledge + 1));

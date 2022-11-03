@@ -1,15 +1,16 @@
 ﻿using library.tokens;
+using library.tree;
 
 namespace library.syntax.tree
 {
     public class SyntaxTree
     {
         public static readonly SyntaxTree Empty = 
-            new(new SyntaxTreeNode(Token.Empty));
+            new(new TreeNode<Token>(Token.Empty));
 
-        public SyntaxTreeNode HeadNode { get; }
+        public TreeNode<Token> HeadNode { get; }
 
-        public SyntaxTree(SyntaxTreeNode headNode)
+        public SyntaxTree(TreeNode<Token> headNode)
         {
             HeadNode = headNode;
         }

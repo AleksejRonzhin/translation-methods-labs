@@ -14,13 +14,13 @@ namespace library.symbols
             return symbolInfo.Index;
         }
 
-        private void CheckOperandType(SymbolInfo symbolInfo, OperandType operandType)
+        private static void CheckOperandType(SymbolInfo symbolInfo, OperandType operandType)
         {
             if (operandType == OperandType.ANY) return;
 
             if (operandType != symbolInfo.OperandType)
             {
-                throw new Exception(); // Уже объявлен с другим типом
+                throw new TokenAlreadyDefinedWithAnotherTypeException(symbolInfo.OperandType);
             }
         }
 
@@ -37,6 +37,13 @@ namespace library.symbols
             StringBuilder stringBuilder = new();
             symbols.ForEach(symbolInfo => stringBuilder.AppendLine(symbolInfo.ToString()));
             return stringBuilder.ToString();
+        }
+
+        internal SymbolInfo GetById(int attributeValue)
+        {
+            var symbolInfo = symbols.SingleOrDefault(symbol => symbol.Index == attributeValue);
+            if (symbolInfo != null) return symbolInfo;
+            throw new Exception();
         }
     }
 }

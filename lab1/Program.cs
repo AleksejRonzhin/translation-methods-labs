@@ -1,7 +1,7 @@
 ﻿using lab1.exceptions;
 using lab1.expressions;
 using lab1.parameters;
-using library.exceptions;
+using library.parameters.exceptions;
 using library.parameters.validators;
 
 var operators = new Dictionary<string, string>()

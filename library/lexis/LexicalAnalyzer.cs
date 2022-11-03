@@ -85,6 +85,19 @@ namespace library.lexis
             {
                 throw new LexicalAnalyzerException(ex.Position, $"Операция {ex.Lexeme} не найдена.");
             }
+            catch (InvalidIdentifierException ex)
+            {
+                throw new LexicalAnalyzerException(ex.Position, $"Неправильно задана переменная {ex.Identifier}");
+            }
+            catch (OperandTypeNotDefinedException ex)
+            {
+                throw new LexicalAnalyzerException(ex.Position, $"Не определен тип {ex.OperandTypeLine} в лексеме {ex.Lexeme}");
+            }
+            catch (ConflictIdentifierTypesException ex)
+            {
+                throw new LexicalAnalyzerException(ex.Position, 
+                    $"Конфликт типов у токена {ex.TokenName}. Встречены типы {ex.FirstOperandType} и {ex.SecondOperandType}.");
+            }
             #endregion
         }
 

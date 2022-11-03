@@ -2,6 +2,7 @@
 using library.lexis.exceptions;
 using library.output;
 using library.parameters.exceptions;
+using library.semantic.exceptions;
 using library.stages;
 using library.symbols;
 using library.syntax.exceptions;
@@ -16,7 +17,6 @@ try
     var inputFilename = new InputFilenameParameter(TakeArgOrThrow(1, "файл исходного выражения")).GetValue();
     using TextReader inputTextReader = new StreamReader(inputFilename);
     StageCreator stageCreator = new(inputTextReader, symbolsTable);
-
     IStage stage = mode switch
     {
         "LEX" or "lex" => stageCreator.CreateLexicalAnalyzerStage(LexicalAnalyzerAction),
@@ -42,6 +42,10 @@ catch (LexicalAnalyzerException ex)
 catch (SyntaxAnalyzerException ex)
 {
     Console.WriteLine($"Синтаксическая ошибка в позиции {ex.Position}! {ex.Text}");
+}
+catch (SemanticAnalyzerException ex)
+{
+    Console.WriteLine($"Cемантическая ошибка! {ex.Text}");
 }
 catch (ValidationException ex)
 {

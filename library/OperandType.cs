@@ -4,7 +4,8 @@
     {
         INTEGER,
         REAL,
-        ANY
+        ANY,
+        NOT_DEFINED
     }
 
     public static class OperandTypeUtils
@@ -25,7 +26,7 @@
             {
                 "i" or "I" => OperandType.INTEGER,
                 "f" or "F" => OperandType.REAL,
-                _ => throw new Exception()
+                _ => OperandType.NOT_DEFINED
             };
         }
     }
