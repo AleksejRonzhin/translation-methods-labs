@@ -16,7 +16,7 @@ namespace library.compiler
         private SyntaxTree? _syntaxTree;
         private SyntaxTree? _modifierSyntaxTree;
         private ThreeAddressCode? _threeAddressCode;
-        private string? _postfixNotation;
+        private PostfixNotation? _postfixNotation;
 
         public List<TokenInfo> Tokens
         {
@@ -50,7 +50,7 @@ namespace library.compiler
             }
         }
 
-        public string PostfixNotation
+        public PostfixNotation PostfixNotation
         {
             get
             {

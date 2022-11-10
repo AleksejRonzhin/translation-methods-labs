@@ -1,25 +1,21 @@
 ﻿using library.compiler.core.models;
 using library.compiler.syntax.tree;
-using System.Text;
 
 namespace library.compiler.generation
 {
     internal class PostfixNotationGenerator
     {
-        internal static string Generate(SyntaxTree modifierSyntaxTree, SymbolsTable symbolsTable)
+        internal static PostfixNotation Generate(SyntaxTree modifierSyntaxTree, SymbolsTable symbolsTable)
         {
             return Rec(modifierSyntaxTree.HeadNode);
         }
 
-        private static string Rec(SyntaxTreeNode node)
+        private static PostfixNotation Rec(SyntaxTreeNode node)
         {
-            StringBuilder stringBuilder = new();
-            node.Children.ForEach(child =>
-            {
-                stringBuilder.Append(Rec(child)).Append(" ");
-            });
-            stringBuilder.Append(node.Value.Token.ToString());
-            return stringBuilder.ToString();
+            List<PostfixNotation> parts = new();
+            node.Children.ForEach(child => parts.Add(Rec(child)));
+            parts.Add(new PostfixNotation(node.Value.Token));
+            return new PostfixNotation(parts);
         }
     }
 }
