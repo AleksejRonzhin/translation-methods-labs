@@ -1,30 +1,30 @@
 ﻿using lab2.parameters;
-using library.compiler.core.symbols;
-using library.compiler.core.tokens;
+using library.compiler;
 using library.compiler.lexis.exceptions;
 using library.compiler.semantic.exceptions;
-using library.compiler.stages;
 using library.compiler.syntax.exceptions;
-using library.compiler.syntax.tree;
 using library.output;
 using library.parameters.exceptions;
 
-SymbolsTable symbolsTable = new();
+Compiler compiler;
 
 try
 {
     var mode = new ModeParameter(TakeArgOrThrow(0, "режим")).GetValue();
     var inputFilename = new InputFilenameParameter(TakeArgOrThrow(1, "файл исходного выражения")).GetValue();
     using TextReader inputTextReader = new StreamReader(inputFilename);
-    StageCreator stageCreator = new(inputTextReader, symbolsTable);
-    IStage stage = mode switch
+    compiler = new(inputTextReader);
+
+    Action action = mode switch
     {
-        "LEX" or "lex" => stageCreator.CreateLexicalAnalyzerStage(LexicalAnalyzerAction),
-        "SYN" or "syn" => stageCreator.CreateSyntaxAnalyzerStage(SyntaxAnalyzerAction),
-        "SEM" or "sem" => stageCreator.CreateSemanticAnalyzerStage(SemanticAnalyzerAction),
+        "LEX" or "lex" => LexicalAnalyzerAction,
+        "SYN" or "syn" => SyntaxAnalyzerAction,
+        "SEM" or "sem" => SemanticAnalyzerAction,
+        "GEN1" or "gen1" => ThreeAddressCodeGeneratorAction,
+        "GEN2" or "gen2" => PostfixNotationGeneratorAction,
         _ => throw new Exception()
     };
-    stage.Execute();
+    action.Invoke();
 
 }
 #region Обработка ошибок
@@ -54,25 +54,46 @@ catch (SemanticAnalyzerException ex)
 }
 #endregion
 
-void LexicalAnalyzerAction(List<TokenInfo> tokens)
+void LexicalAnalyzerAction()
 {
     var tokensFilename = new TokensFilenameParameter(TakeArgOrThrow(2, "файл токенов")).GetValue();
-    TokensInFileWriter.WriteTokens(tokensFilename, tokens);
-
     var symbolsTableFilename = new SymbolsTableFilenameParameter(TakeArgOrThrow(3, "файл таблицы символов")).GetValue();
-    SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, symbolsTable);
+
+    TokensInFileWriter.WriteTokens(tokensFilename, compiler.Tokens);
+    SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
 }
 
-void SyntaxAnalyzerAction(SyntaxTree syntaxTree)
+void SyntaxAnalyzerAction()
 {
     var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
-    SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, syntaxTree);
+    SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, compiler.SyntaxTree);
 }
 
-void SemanticAnalyzerAction(SyntaxTree modeSyntaxTree)
+void SemanticAnalyzerAction()
 {
     var syntaxTreeFilename = new SyntaxTreeFilenameParameter(TakeArgOrThrow(2, "файл синтаксического дерева")).GetValue();
-    SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, modeSyntaxTree);
+    var symbolsTableFilename = new SymbolsTableFilenameParameter(TakeArgOrThrow(3, "файл таблицы символов")).GetValue();
+
+    SyntaxTreeInFileWriter.WriteSyntaxTree(syntaxTreeFilename, compiler.ModifierSyntaxTree);
+    SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
+}
+
+void ThreeAddressCodeGeneratorAction()
+{
+    var threeAddressCodeFilename = "portable_code.txt";
+    var symbolsTableFilename = "symbols.txt";
+
+    ThreeAddressCodeInFileWriter.WriteThreeAddressCode(threeAddressCodeFilename, compiler.ThreeAddressCode);
+    SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
+}
+
+void PostfixNotationGeneratorAction()
+{
+    var postfixFilename = "postfix.txt";
+    var symbolsTableFilename = "symbols.txt";
+
+    PostfixNotationInFileWriter.WritePostfixNotation(postfixFilename, compiler.PostfixNotation);
+    SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
 }
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")

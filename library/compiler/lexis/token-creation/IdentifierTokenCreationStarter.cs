@@ -1,5 +1,4 @@
-﻿using library.compiler.core.operations;
-using library.compiler.core.symbols;
+﻿using library.compiler.core.models;
 using library.compiler.core.symbols.exceptions;
 using library.compiler.core.tokens;
 using library.compiler.lexis.exceptions;
@@ -44,7 +43,7 @@ namespace library.tokens.creation
                 string text = $"идентификатор с именем {tokenName}";
                 try
                 {
-                    int attributeValue = symbolsTable.GetOrAddSymbol(tokenName, operandType);
+                    int attributeValue = symbolsTable.GetIndexOrAddSymbol(tokenName, operandType);
                     return CreateTokenInfo(new IdentifierToken(tokenName, attributeValue), text);
                 } catch(TokenAlreadyDefinedWithAnotherTypeException ex)
                 {

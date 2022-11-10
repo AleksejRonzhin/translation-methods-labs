@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using library.compiler.core.symbols;
+using library.compiler.core.models;
 
 namespace library.output
 {
@@ -10,6 +10,5 @@ namespace library.output
             
             WriteToFile(table.ToString(), symbolsTableFilename);
         }
-
     }
 }

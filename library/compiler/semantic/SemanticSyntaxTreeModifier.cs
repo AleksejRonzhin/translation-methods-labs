@@ -1,5 +1,4 @@
-﻿using library.compiler.core.operations;
-using library.compiler.core.symbols;
+﻿using library.compiler.core.models;
 using library.compiler.core.tokens;
 using library.compiler.syntax.tree;
 
@@ -35,11 +34,11 @@ namespace library.compiler.semantic
         private HashSet<OperandType> GetOperandsTypes(List<SyntaxTreeNode> children)
         {
             var operandTypes = new HashSet<OperandType>();
-            children.ForEach(child => operandTypes.Add(GetOperandTypeNode(child)));
+            children.ForEach(child => operandTypes.Add(GetNodeOperandType(child)));
             return operandTypes;
         }
 
-        private OperandType GetOperandTypeNode(SyntaxTreeNode node)
+        private OperandType GetNodeOperandType(SyntaxTreeNode node)
         {
             var token = node.Value.Token;
             if (token is IdentifierToken identifierToken)
@@ -47,7 +46,6 @@ namespace library.compiler.semantic
                 var index = identifierToken.AttributeValue;
                 if (index == null) throw new Exception();
                 return symbolsTable.GetById((int)index).OperandType;
-
             }
             if (token is ConstantToken constantToken)
             {
@@ -57,7 +55,7 @@ namespace library.compiler.semantic
             {
                 return GetOperationResultType(node);
             }
-            if (token is FunctionToken functionToken)
+            if (token is UnaryFunctionToken functionToken)
             {
                 return functionToken.ResultType;
             }
@@ -75,7 +73,7 @@ namespace library.compiler.semantic
             List<(SyntaxTreeNode oldNode, SyntaxTreeNode newNode)> replacePairs = new();
             node.Children.ForEach(child =>
             {
-                if (GetOperandTypeNode(child) != requiredType)
+                if (GetNodeOperandType(child) != requiredType)
                 {
                     var castNode = new SyntaxTreeNode(new TokenInfo(new CastIntToRealFunctionToken(), 0, ""));
                     castNode.AddChild(child);

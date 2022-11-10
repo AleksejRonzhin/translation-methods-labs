@@ -1,14 +1,14 @@
 ﻿using System.Text;
-using library.compiler.core.operations;
+using library.compiler.core.symbols;
 using library.compiler.core.symbols.exceptions;
 
-namespace library.compiler.core.symbols
+namespace library.compiler.core.models
 {
     public class SymbolsTable
     {
         private readonly List<SymbolInfo> symbols = new();
 
-        public int GetOrAddSymbol(string symbolName, OperandType operandType)
+        public int GetIndexOrAddSymbol(string symbolName, OperandType operandType)
         {
             var symbolInfo = symbols.SingleOrDefault(it => it.Name == symbolName);
             if (symbolInfo is null) return AddSymbol(symbolName, operandType);

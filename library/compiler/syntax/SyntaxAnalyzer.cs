@@ -1,4 +1,5 @@
-﻿using library.compiler.core.tokens;
+﻿using library.compiler.core.models;
+using library.compiler.core.tokens;
 using library.compiler.syntax.exceptions;
 using library.compiler.syntax.tree;
 using System;

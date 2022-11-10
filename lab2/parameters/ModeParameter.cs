@@ -9,7 +9,8 @@ namespace lab2.parameters
     {
         public ModeParameter(string arg)
            : base(arg, new EmptyMapper<string>(), 
-                 new ValuesContainValueValidator<string>("LEX", "lex", "SYN", "syn", "SEM", "sem"))
+                 new ValuesContainValueValidator<string>("LEX", "lex", "SYN", "syn", "SEM", "sem", 
+                     "GEN1", "gen1", "GEN2", "gen2"))
         {
         }
 

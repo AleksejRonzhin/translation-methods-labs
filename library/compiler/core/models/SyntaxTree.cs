@@ -1,6 +1,7 @@
 ﻿using library.compiler.core.tokens;
+using library.compiler.syntax.tree;
 
-namespace library.compiler.syntax.tree
+namespace library.compiler.core.models
 {
     public class SyntaxTree
     {

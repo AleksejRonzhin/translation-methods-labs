@@ -1,4 +1,4 @@
-﻿using library.compiler.core.symbols;
+﻿using library.compiler.core.models;
 using library.compiler.core.tokens;
 using library.compiler.lexis.exceptions;
 using library.tokens.creation;

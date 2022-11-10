@@ -1,4 +1,4 @@
-﻿namespace library.compiler.core.operations
+﻿namespace library.compiler.core.models
 {
     public enum OperandType
     {

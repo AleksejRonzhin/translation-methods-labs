@@ -1,4 +1,4 @@
-﻿using library.compiler.core.operations;
+﻿using library.compiler.core.models;
 
 namespace library.compiler.core.tokens
 {

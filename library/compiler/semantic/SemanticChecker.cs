@@ -1,6 +1,7 @@
 ﻿using library.compiler.core.tokens;
 using library.compiler.syntax.tree;
 using library.compiler.semantic.exceptions;
+using library.compiler.core.models;
 
 namespace library.compiler.semantic
 {

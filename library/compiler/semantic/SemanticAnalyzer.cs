@@ -1,6 +1,5 @@
-﻿using library.compiler.core.symbols;
+﻿using library.compiler.core.models;
 using library.compiler.semantic.exceptions;
-using library.compiler.syntax.tree;
 
 namespace library.compiler.semantic
 {
