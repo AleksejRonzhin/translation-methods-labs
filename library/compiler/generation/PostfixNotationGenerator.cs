@@ -1,13 +1,20 @@
 ﻿using library.compiler.core.models;
+using library.compiler.optimization;
 using library.compiler.syntax.tree;
 
 namespace library.compiler.generation
 {
     internal class PostfixNotationGenerator
     {
-        internal static PostfixNotation Generate(SyntaxTree modifierSyntaxTree, SymbolsTable symbolsTable)
+        internal static PostfixNotation Generate(SyntaxTree modifierSyntaxTree, SymbolsTable symbolsTable, bool withOptimization)
         {
-            return Rec(modifierSyntaxTree.HeadNode);
+            SyntaxTree syntaxTree = modifierSyntaxTree;
+            if (withOptimization)
+            {
+                syntaxTree = SyntaxTreeOptimizer.Optimize(syntaxTree);
+            }
+
+            return Rec(syntaxTree.HeadNode);
         }
 
         private static PostfixNotation Rec(SyntaxTreeNode node)

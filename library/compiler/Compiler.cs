@@ -42,27 +42,20 @@ namespace library.compiler
             }
         }
 
-        public ThreeAddressCode ThreeAddressCode
-        {
-            get
-            {
-                return _threeAddressCode ??= ThreeAddressCodeGenerator.Generate(ModifierSyntaxTree, SymbolsTable);
-            }
-        }
-
-        public PostfixNotation PostfixNotation
-        {
-            get
-            {
-                return _postfixNotation ??= PostfixNotationGenerator.Generate(ModifierSyntaxTree, SymbolsTable);
-            }
-        }
-
         public Compiler(TextReader inputTextReader)
         {
             this._inputTextReader = inputTextReader;
         }
 
+        public ThreeAddressCode GetThreeAddressCode(bool withOptimization)
+        {
+            return _threeAddressCode ??= ThreeAddressCodeGenerator.Generate(ModifierSyntaxTree, SymbolsTable, withOptimization);
+        }
+
+        public PostfixNotation GetPostfixNotation(bool withOptimization)
+        {
+            return _postfixNotation ??= PostfixNotationGenerator.Generate(ModifierSyntaxTree, SymbolsTable, withOptimization);
+        }
 
     }
 }

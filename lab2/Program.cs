@@ -22,6 +22,8 @@ try
         "SEM" or "sem" => SemanticAnalyzerAction,
         "GEN1" or "gen1" => ThreeAddressCodeGeneratorAction,
         "GEN2" or "gen2" => PostfixNotationGeneratorAction,
+        "GEN1_OPT" or "gen1_opt" => ThreeAddressCodeGeneratorWithOptimizationAction,
+        "GEN2_OPT" or "gen2_opt" => PostfixNotationGeneratorWithOptimizationAction,
         _ => throw new Exception()
     };
     action.Invoke();
@@ -80,21 +82,40 @@ void SemanticAnalyzerAction()
 
 void ThreeAddressCodeGeneratorAction()
 {
-    var threeAddressCodeFilename = "portable_code.txt";
-    var symbolsTableFilename = "symbols.txt";
-
-    ThreeAddressCodeInFileWriter.WriteThreeAddressCode(threeAddressCodeFilename, compiler.ThreeAddressCode);
-    SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
+    GenerateThreeAddressCode(false);
 }
 
 void PostfixNotationGeneratorAction()
 {
+    GeneratePostfixNotation(false);
+}
+
+
+void PostfixNotationGeneratorWithOptimizationAction()
+{
+    GeneratePostfixNotation(true);
+}
+
+void ThreeAddressCodeGeneratorWithOptimizationAction()
+{
+    GenerateThreeAddressCode(true);
+}
+
+void GeneratePostfixNotation(bool withOptimization)
+{
     var postfixFilename = "postfix.txt";
+    PostfixNotationInFileWriter.WritePostfixNotation(postfixFilename, compiler.GetPostfixNotation(withOptimization));
+}
+
+void GenerateThreeAddressCode(bool withOptimization)
+{
+    var threeAddressCodeFilename = "portable_code.txt";
     var symbolsTableFilename = "symbols.txt";
 
-    PostfixNotationInFileWriter.WritePostfixNotation(postfixFilename, compiler.PostfixNotation);
+    ThreeAddressCodeInFileWriter.WriteThreeAddressCode(threeAddressCodeFilename, compiler.GetThreeAddressCode(withOptimization));
     SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
 }
+
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")
 {
