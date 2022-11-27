@@ -1,4 +1,6 @@
-﻿namespace library.compiler.core.models
+﻿using library.compiler.core.tokens;
+
+namespace library.compiler.core.models
 {
     public class Operation
     {

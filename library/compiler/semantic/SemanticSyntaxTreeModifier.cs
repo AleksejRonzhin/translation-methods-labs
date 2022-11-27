@@ -16,14 +16,14 @@ namespace library.compiler.semantic
         public SyntaxTree Modify(SyntaxTree syntaxTree)
         {
             var headNode = syntaxTree.HeadNode;
-            if (headNode.Value.Token is OperationToken)
+            if (headNode.Value.Token is OperationToken operationToken)
             {
-                _ = GetOperationResultType(headNode);
+                _ = GetOperationResultType(headNode, operationToken.Operation);
             }
             return syntaxTree;
         }
 
-        private OperandType GetOperationResultType(SyntaxTreeNode node)
+        private OperandType GetOperationResultType(SyntaxTreeNode node, Operation operation)
         {
             var operandTypes = GetOperandsTypes(node.Children);
             var requiredType = GetPrioritetType(operandTypes);
@@ -51,9 +51,9 @@ namespace library.compiler.semantic
             {
                 return constantToken.GetOperandType();
             }
-            if (token is OperationToken)
+            if (token is OperationToken operationToken)
             {
-                return GetOperationResultType(node);
+                return GetOperationResultType(node, operationToken.Operation);
             }
             if (token is UnaryFunctionToken functionToken)
             {

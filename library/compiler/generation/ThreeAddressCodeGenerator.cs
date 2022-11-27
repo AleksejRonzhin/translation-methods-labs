@@ -1,5 +1,6 @@
 ﻿using library.compiler.core.models;
 using library.compiler.optimization;
+using library.compiler.syntax.tree;
 
 namespace library.compiler.generation
 {
@@ -15,7 +16,11 @@ namespace library.compiler.generation
 
             ThreeAddressCodeGeneratorHelper helper = new(symbolsTable);
             helper.Start(syntaxTree);
-            return helper.Result;
+
+            var result = helper.Result;
+            if (withOptimization)
+                result = ThreeAddressCodeOptimizer.Optimize(result, symbolsTable);
+            return result;
         }
     }
 }
