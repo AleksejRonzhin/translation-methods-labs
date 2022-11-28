@@ -4,7 +4,7 @@ namespace library.compiler.core.tokens
 {
     public class CastIntToRealFunctionToken : UnaryFunctionToken
     {
-        public CastIntToRealFunctionToken() : base("IntToRealCast", "i2r", OperandType.INTEGER, OperandType.REAL)
+        public CastIntToRealFunctionToken() : base("i2r", "i2r", OperandType.INTEGER, OperandType.REAL)
         {
         }
     }

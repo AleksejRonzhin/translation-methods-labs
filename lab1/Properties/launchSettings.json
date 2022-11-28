@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "lab1": {
-      "commandName": "Project",
-      "commandLineArgs": "T result data.txt 8 3 4"
-    }
-  }
-}

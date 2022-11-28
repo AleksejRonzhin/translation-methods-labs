@@ -43,7 +43,7 @@ namespace library.tokens.creation
                 string text = $"идентификатор с именем {tokenName}";
                 try
                 {
-                    int attributeValue = symbolsTable.GetIndexOrAddSymbol(tokenName, operandType);
+                    int attributeValue = symbolsTable.GetIndexOrAddSymbol(tokenName, operandType, false);
                     return CreateTokenInfo(new IdentifierToken(tokenName, attributeValue), text);
                 } catch(TokenAlreadyDefinedWithAnotherTypeException ex)
                 {

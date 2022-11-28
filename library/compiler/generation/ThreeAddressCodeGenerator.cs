@@ -19,7 +19,10 @@ namespace library.compiler.generation
 
             var result = helper.Result;
             if (withOptimization)
+            {
                 result = ThreeAddressCodeOptimizer.Optimize(result, symbolsTable);
+            }
+
             return result;
         }
     }

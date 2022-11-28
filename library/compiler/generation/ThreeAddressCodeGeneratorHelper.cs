@@ -22,17 +22,17 @@ namespace library.compiler.generation
             _ = Rec(modifierSyntaxTree.HeadNode);
         }
 
-        private (string result, OperandType type) Rec(SyntaxTreeNode node)
+        private (OperandToken result, OperandType type) Rec(SyntaxTreeNode node)
         {
-            if (!IsOperation(node)) return (node.Value.Token.ToString(), GetOperandType(node));
+            if (!IsOperation(node)) return ((OperandToken)node.Value.Token, GetOperandType(node));
 
-            (string operand1, OperandType operand1Type) = Rec(node.Children[0]);
-            string? operand2 = null;
+            (OperandToken operand1, OperandType operand1Type) = Rec(node.Children[0]);
+            OperandToken? operand2 = null;
             if(node.Children.Count > 1) (operand2, _) = Rec(node.Children[1]);
 
             string code = GetOperationCode(node);
             OperandType operandType = GetOperandType(node, operand1Type);
-            string result = GenerateTemp(operandType);
+            OperandToken result = GenerateTemp(operandType);
 
             ThreeAddressLine line = new(code, result, operand1, operand2);
             Result.AddLine(line);
@@ -58,7 +58,7 @@ namespace library.compiler.generation
             {
                 var index = identifierToken.AttributeValue;
                 if (index == null) throw new Exception();
-                return _symbolsTable.GetById((int)index).OperandType;
+                return _symbolsTable.GetByIndex((int)index).OperandType;
             }
             if (node.Value.Token is ConstantToken constantToken)
             {
@@ -80,10 +80,11 @@ namespace library.compiler.generation
             return false;
         }
 
-        private string GenerateTemp(OperandType operandType)
+        private OperandToken GenerateTemp(OperandType operandType)
         {
-            int index = _symbolsTable.GetIndexOrAddSymbol($"T{++_tempCount}", operandType);
-            return $"<id, {index}>";
+            string tokenName = $"T{++_tempCount}";
+            int index = _symbolsTable.GetIndexOrAddSymbol(tokenName, operandType, true);
+            return new IdentifierToken(tokenName, index);
         }
 
         private static string GetOperationCode(SyntaxTreeNode node)

@@ -1,7 +1,8 @@
 ﻿using library.compiler.core.models;
 using library.compiler.core.tokens;
+using library.compiler.generation;
 using library.compiler.syntax.tree;
-using System.Globalization;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace library.compiler.optimization
 {
@@ -9,12 +10,12 @@ namespace library.compiler.optimization
     {
         public static SyntaxTree Optimize(SyntaxTree syntaxTree)
         {
-            Console.WriteLine(SyntaxTreePrinter.Print(syntaxTree));
+            Console.WriteLine("Before optimization:");
+            Console.WriteLine(InfixNotationGenerator.Generate(syntaxTree));
             Rec(syntaxTree.HeadNode);
-
             var result = new SyntaxTree(TryOptimize(syntaxTree.HeadNode));
-            Console.WriteLine();
-            Console.WriteLine(SyntaxTreePrinter.Print(result));
+            Console.WriteLine("After optimization:");
+            Console.WriteLine(InfixNotationGenerator.Generate(result));
             return result;
         }
 
@@ -64,10 +65,26 @@ namespace library.compiler.optimization
                 _ => 0
             };
             OperandType resultType = firstToken.GetOperandType();
-            (var resultTokenName, var text) = resultType == OperandType.REAL || operation.Sign == "/" ? 
-                (result.ToString(ConstantToken.numberFormatInfo), "константа вещественного числа") 
-                : (((int)result).ToString(), "константа целого числа");
-            return new SyntaxTreeNode(new TokenInfo(new ConstantToken(resultTokenName), -1, text));
+            return CreateSyntaxTreeConstantNode(resultType, operation, result);
+        }
+
+        private static SyntaxTreeNode CreateSyntaxTreeConstantNode(OperandType resultType, Operation operation, double value)
+        {
+            string text;
+            string tokenName;
+            if (resultType == OperandType.REAL || operation.Sign == "/")
+            {
+                tokenName = value.ToString(ConstantToken.numberFormatInfo);
+                if (!tokenName.Contains('.')) tokenName += ".0";
+                text = "константа вещественного числа";
+            }
+            else
+            {
+                tokenName = ((int)value).ToString();
+                text = "константа целого числа";
+            }
+
+            return new SyntaxTreeNode(new TokenInfo(new ConstantToken(tokenName), -1, text));
         }
 
         private static SyntaxTreeNode TryOptimizeSecondOperand(Operation operation, ConstantToken secondOperand, SyntaxTreeNode sourceNode)
@@ -116,7 +133,7 @@ namespace library.compiler.optimization
             if (node.Value.Token is CastIntToRealFunctionToken castToken)
             {
                 var operand = node.Children[0].Value.Token;
-                if(operand is ConstantToken)
+                if (operand is ConstantToken)
                 {
                     return new SyntaxTreeNode(new TokenInfo(new ConstantToken(operand.TokenName + ".0"), -1, "константа вещественного числа"));
                 }

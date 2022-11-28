@@ -54,7 +54,7 @@ namespace library.compiler
 
         public PostfixNotation GetPostfixNotation(bool withOptimization)
         {
-            return _postfixNotation ??= PostfixNotationGenerator.Generate(ModifierSyntaxTree, SymbolsTable, withOptimization);
+            return _postfixNotation ??= PostfixNotationGenerator.Generate(ModifierSyntaxTree, withOptimization);
         }
 
     }

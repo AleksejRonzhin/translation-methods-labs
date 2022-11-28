@@ -5,7 +5,7 @@ namespace library.compiler.core.tokens
 {
     public class ConstantToken : OperandToken
     {
-        public readonly static NumberFormatInfo numberFormatInfo = new NumberFormatInfo
+        public readonly static NumberFormatInfo numberFormatInfo = new()
         {
             NumberDecimalSeparator = "."
         };

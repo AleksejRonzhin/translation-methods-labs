@@ -38,8 +38,7 @@ namespace library.compiler.syntax.tree
 
         private static TokenInfo GetOperation(List<TokenInfo> operations, bool isAssociative, bool isDirectProcedure)
         {
-            return isAssociative ? operations[operations.Count / 2]
-                    : isDirectProcedure ? operations.Last() : operations.First();
+            return isDirectProcedure ? operations.Last() : operations.First();
         }
 
         private static SyntaxTreeNode? CreateSyntaxTreeNode(TokenInfo tokenInfo)

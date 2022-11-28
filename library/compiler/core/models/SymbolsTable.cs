@@ -8,10 +8,10 @@ namespace library.compiler.core.models
     {
         private readonly List<SymbolInfo> symbols = new();
 
-        public int GetIndexOrAddSymbol(string symbolName, OperandType operandType)
+        public int GetIndexOrAddSymbol(string symbolName, OperandType operandType, bool isTemp)
         {
             var symbolInfo = symbols.SingleOrDefault(it => it.Name == symbolName);
-            if (symbolInfo is null) return AddSymbol(symbolName, operandType);
+            if (symbolInfo is null) return AddSymbol(symbolName, operandType, isTemp);
             CheckOperandType(symbolInfo, operandType);
             return symbolInfo.Index;
         }
@@ -26,10 +26,15 @@ namespace library.compiler.core.models
             }
         }
 
-        private int AddSymbol(string symbolName, OperandType operandType)
+        public void DeleteSymbolByIndex(int index)
+        {
+            symbols.Remove(GetByIndex(index));
+        }
+
+        private int AddSymbol(string symbolName, OperandType operandType, bool isTemp)
         {
             if (operandType == OperandType.ANY) operandType = OperandType.INTEGER;
-            var symbolInfo = new SymbolInfo(symbols.Count + 1, symbolName, operandType);
+            var symbolInfo = new SymbolInfo(symbols.Count + 1, symbolName, operandType, isTemp);
             symbols.Add(symbolInfo);
             return symbolInfo.Index;
         }
@@ -41,7 +46,7 @@ namespace library.compiler.core.models
             return stringBuilder.ToString();
         }
 
-        internal SymbolInfo GetById(int attributeValue)
+        internal SymbolInfo GetByIndex(int attributeValue)
         {
             var symbolInfo = symbols.SingleOrDefault(symbol => symbol.Index == attributeValue);
             if (symbolInfo != null) return symbolInfo;

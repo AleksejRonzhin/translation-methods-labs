@@ -6,7 +6,7 @@ namespace library.compiler.generation
 {
     internal class PostfixNotationGenerator
     {
-        internal static PostfixNotation Generate(SyntaxTree modifierSyntaxTree, SymbolsTable symbolsTable, bool withOptimization)
+        internal static PostfixNotation Generate(SyntaxTree modifierSyntaxTree, bool withOptimization)
         {
             SyntaxTree syntaxTree = modifierSyntaxTree;
             if (withOptimization)

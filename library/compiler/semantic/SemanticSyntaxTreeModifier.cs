@@ -45,7 +45,7 @@ namespace library.compiler.semantic
             {
                 var index = identifierToken.AttributeValue;
                 if (index == null) throw new Exception();
-                return symbolsTable.GetById((int)index).OperandType;
+                return symbolsTable.GetByIndex((int)index).OperandType;
             }
             if (token is ConstantToken constantToken)
             {
