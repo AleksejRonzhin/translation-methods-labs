@@ -15,12 +15,32 @@ namespace library.compiler.optimization
                 var line = lines[i];
                 var lineResult = line.Result;
                 var firstOperand = line.FirstOperand;
-                if (TryOptimizeOperand(firstOperand, lineResult, symbolsTable, lines.GetRange(i, lines.Count - i))) continue;
+                if(GetOperandType(lineResult, symbolsTable) == GetOperandType(firstOperand, symbolsTable))
+                    if (TryOptimizeOperand(firstOperand, lineResult, symbolsTable, lines.GetRange(i, lines.Count - i))) continue;
+                
+
                 var secondOperand = line.SecondOperand;
-                if (secondOperand != null && TryOptimizeOperand(secondOperand, lineResult, symbolsTable, lines.GetRange(i, lines.Count - i))) continue;
+
+                if (secondOperand != null && GetOperandType(lineResult, symbolsTable) == GetOperandType(secondOperand, symbolsTable))
+                    if (TryOptimizeOperand(secondOperand, lineResult, symbolsTable, lines.GetRange(i, lines.Count - i))) continue;
             }
             Print(threeAddressCode, "After optimization:");
             return threeAddressCode;
+        }
+
+        private static OperandType GetOperandType(OperandToken operandToken, SymbolsTable symbolsTable)
+        {
+            if(operandToken is IdentifierToken)
+            {
+                int? index = operandToken.AttributeValue;
+                if (index == null) throw new Exception();
+                return symbolsTable.GetByIndex((int)index).OperandType;
+            }
+            if(operandToken is ConstantToken constantToken)
+            {
+                return constantToken.GetOperandType();
+            }
+            return OperandType.NOT_DEFINED;
         }
 
         private static void Print(ThreeAddressCode threeAddressCode, string title)

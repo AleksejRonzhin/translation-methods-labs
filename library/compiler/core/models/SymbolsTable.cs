@@ -47,7 +47,7 @@ namespace library.compiler.core.models
             return stringBuilder.ToString();
         }
 
-        internal SymbolInfo GetByIndex(int attributeValue)
+        public SymbolInfo GetByIndex(int attributeValue)
         {
             var symbolInfo = Symbols.SingleOrDefault(symbol => symbol.Index == attributeValue);
             if (symbolInfo != null) return symbolInfo;

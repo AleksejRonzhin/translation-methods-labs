@@ -28,6 +28,11 @@ namespace library.compiler.core.models
             set { _operand2 = value; }
         }
 
+        public string OperationCode
+        {
+            get { return _operationCode; }
+        } 
+
         public ThreeAddressLine(string operationCode, OperandToken result, OperandToken operand1, OperandToken? operand2 = null)
         {
             _operationCode = operationCode;
