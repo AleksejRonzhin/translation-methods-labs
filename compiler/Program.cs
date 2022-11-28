@@ -1,10 +1,12 @@
-﻿using lab2.parameters;
+﻿using compiler.parameters;
 using library.compiler;
+using library.compiler.core.models;
 using library.compiler.lexis.exceptions;
 using library.compiler.semantic.exceptions;
 using library.compiler.syntax.exceptions;
 using library.output;
 using library.parameters.exceptions;
+using System.Runtime.Serialization.Formatters.Binary;
 
 Compiler compiler;
 
@@ -24,10 +26,10 @@ try
         "GEN2" or "gen2" => PostfixNotationGeneratorAction,
         "GEN1_OPT" or "gen1_opt" => ThreeAddressCodeGeneratorWithOptimizationAction,
         "GEN2_OPT" or "gen2_opt" => PostfixNotationGeneratorWithOptimizationAction,
+        "GEN3" or "gen3" => BinaryGeneratorAction,
         _ => throw new Exception()
     };
     action.Invoke();
-
 }
 #region Обработка ошибок
 catch (ParameterNotFoundException ex)
@@ -116,6 +118,20 @@ void GenerateThreeAddressCode(bool withOptimization)
     SymbolsTableInFileWriter.WriteSymbolsTable(symbolsTableFilename, compiler.SymbolsTable);
 }
 
+void BinaryGeneratorAction()
+{
+    var binaryFileName = "post_code.bin";
+
+    ThreeAddressCode threeAddressCode = compiler.GetThreeAddressCode(true);
+    SymbolsTable symbolsTable = compiler.SymbolsTable;
+
+    BinaryFormatter formatter = new();
+    FileStream fileStream = new FileStream(binaryFileName, FileMode.OpenOrCreate);
+    formatter.Serialize(fileStream, threeAddressCode);
+    formatter.Serialize(fileStream, symbolsTable);
+    fileStream.Close();
+    Console.WriteLine($"Generated {binaryFileName}");
+}
 
 string TakeArgOrThrow(int argNumber, string parameterName = "")
 {

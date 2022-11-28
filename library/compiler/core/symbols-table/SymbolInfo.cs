@@ -2,11 +2,13 @@
 
 namespace library.compiler.core.symbols
 {
+    [Serializable]
     public class SymbolInfo
     {
         public int Index { get; }
         public string Name { get; }
         public OperandType OperandType { get; }
+        public string? Value { get; set; }
 
         public bool IsTemp { get; }
 
@@ -17,6 +19,8 @@ namespace library.compiler.core.symbols
             OperandType = operandType;
             IsTemp = isTemp;
         }
+
+
 
         public override string? ToString()
         {

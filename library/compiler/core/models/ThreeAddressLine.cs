@@ -2,6 +2,7 @@
 
 namespace library.compiler.core.models
 {
+    [Serializable]
     public class ThreeAddressLine
     {
         private readonly string _operationCode;

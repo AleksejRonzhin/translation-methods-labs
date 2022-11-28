@@ -2,7 +2,7 @@
 using library.parameters.mappers;
 using library.parameters.validators;
 
-namespace lab2.parameters
+namespace compiler.parameters
 {
     internal class TokensFilenameParameter : Parameter<string>
     {

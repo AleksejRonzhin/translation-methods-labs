@@ -1,5 +1,6 @@
 ﻿namespace library.compiler.core.tokens
 {
+    [Serializable]
     public abstract class Token
     {
         public static readonly Token Empty = new EmptyToken();

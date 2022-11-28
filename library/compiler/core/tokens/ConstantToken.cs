@@ -3,6 +3,7 @@ using System.Globalization;
 
 namespace library.compiler.core.tokens
 {
+    [Serializable]
     public class ConstantToken : OperandToken
     {
         public readonly static NumberFormatInfo numberFormatInfo = new()

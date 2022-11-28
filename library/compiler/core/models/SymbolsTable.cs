@@ -4,13 +4,14 @@ using library.compiler.core.symbols.exceptions;
 
 namespace library.compiler.core.models
 {
+    [Serializable]
     public class SymbolsTable
     {
-        private readonly List<SymbolInfo> symbols = new();
+        public List<SymbolInfo> Symbols { get; } = new();
 
         public int GetIndexOrAddSymbol(string symbolName, OperandType operandType, bool isTemp)
         {
-            var symbolInfo = symbols.SingleOrDefault(it => it.Name == symbolName);
+            var symbolInfo = Symbols.SingleOrDefault(it => it.Name == symbolName);
             if (symbolInfo is null) return AddSymbol(symbolName, operandType, isTemp);
             CheckOperandType(symbolInfo, operandType);
             return symbolInfo.Index;
@@ -28,27 +29,27 @@ namespace library.compiler.core.models
 
         public void DeleteSymbolByIndex(int index)
         {
-            symbols.Remove(GetByIndex(index));
+            Symbols.Remove(GetByIndex(index));
         }
 
         private int AddSymbol(string symbolName, OperandType operandType, bool isTemp)
         {
             if (operandType == OperandType.ANY) operandType = OperandType.INTEGER;
-            var symbolInfo = new SymbolInfo(symbols.Count + 1, symbolName, operandType, isTemp);
-            symbols.Add(symbolInfo);
+            var symbolInfo = new SymbolInfo(Symbols.Count + 1, symbolName, operandType, isTemp);
+            Symbols.Add(symbolInfo);
             return symbolInfo.Index;
         }
 
         public override string ToString()
         {
             StringBuilder stringBuilder = new();
-            symbols.ForEach(symbolInfo => stringBuilder.AppendLine(symbolInfo.ToString()));
+            Symbols.ForEach(symbolInfo => stringBuilder.AppendLine(symbolInfo.ToString()));
             return stringBuilder.ToString();
         }
 
         internal SymbolInfo GetByIndex(int attributeValue)
         {
-            var symbolInfo = symbols.SingleOrDefault(symbol => symbol.Index == attributeValue);
+            var symbolInfo = Symbols.SingleOrDefault(symbol => symbol.Index == attributeValue);
             if (symbolInfo != null) return symbolInfo;
             throw new Exception();
         }

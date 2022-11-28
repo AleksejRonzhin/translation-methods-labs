@@ -2,7 +2,8 @@
 
 namespace library.compiler.core.models
 {
-    public class ThreeAddressCode
+    [Serializable]
+    public class ThreeAddressCode 
     {
         public List<ThreeAddressLine> Lines
         {
