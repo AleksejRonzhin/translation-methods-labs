@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using library.compiler.core.symbols;
 using library.compiler.core.symbols.exceptions;
+using library.compiler.core.tokens;
 
 namespace library.compiler.core.models
 {
@@ -52,6 +53,19 @@ namespace library.compiler.core.models
             var symbolInfo = Symbols.SingleOrDefault(symbol => symbol.Index == attributeValue);
             if (symbolInfo != null) return symbolInfo;
             throw new Exception();
+        }
+
+        public SymbolInfo GetByOperandToken(OperandToken operandToken)
+        {
+            int? index = operandToken.AttributeValue;
+            if (index != null) return GetByIndex((int)index); 
+            throw new Exception();
+        }
+
+        public void DeleteByOperandToken(OperandToken operandToken)
+        {
+            var symbolInfo = GetByOperandToken(operandToken);
+            Symbols.Remove(symbolInfo);
         }
     }
 }

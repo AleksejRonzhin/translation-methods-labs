@@ -1,4 +1,5 @@
 ﻿using library.compiler.core.models;
+using library.compiler.syntax.tree;
 using System.Globalization;
 
 namespace library.compiler.core.tokens
@@ -10,7 +11,6 @@ namespace library.compiler.core.tokens
         {
             NumberDecimalSeparator = "."
         };
-
 
         public ConstantToken(string tokenName) : base(tokenName)
         {

@@ -15,14 +15,12 @@ namespace library.compiler.optimization
                 var line = lines[i];
                 var lineResult = line.Result;
                 var firstOperand = line.FirstOperand;
-                if(GetOperandType(lineResult, symbolsTable) == GetOperandType(firstOperand, symbolsTable))
-                    if (TryOptimizeOperand(firstOperand, lineResult, symbolsTable, lines.GetRange(i, lines.Count - i))) continue;
-                
+                var nextLines = lines.GetRange(i, lines.Count - i);
+                if (TryOptimizeOperand(firstOperand, lineResult, symbolsTable, nextLines)) continue;
 
                 var secondOperand = line.SecondOperand;
-
-                if (secondOperand != null && GetOperandType(lineResult, symbolsTable) == GetOperandType(secondOperand, symbolsTable))
-                    if (TryOptimizeOperand(secondOperand, lineResult, symbolsTable, lines.GetRange(i, lines.Count - i))) continue;
+                if (secondOperand != null 
+                    && TryOptimizeOperand(secondOperand, lineResult, symbolsTable, nextLines)) continue;
             }
             Print(threeAddressCode, "After optimization:");
             return threeAddressCode;
@@ -30,13 +28,13 @@ namespace library.compiler.optimization
 
         private static OperandType GetOperandType(OperandToken operandToken, SymbolsTable symbolsTable)
         {
-            if(operandToken is IdentifierToken)
+            if (operandToken is IdentifierToken)
             {
                 int? index = operandToken.AttributeValue;
                 if (index == null) throw new Exception();
                 return symbolsTable.GetByIndex((int)index).OperandType;
             }
-            if(operandToken is ConstantToken constantToken)
+            if (operandToken is ConstantToken constantToken)
             {
                 return constantToken.GetOperandType();
             }
@@ -52,32 +50,34 @@ namespace library.compiler.optimization
             });
         }
 
-        private static bool TryOptimizeOperand(OperandToken operand, OperandToken replaceableOperand, SymbolsTable symbolsTable, List<ThreeAddressLine> lines)
+        private static bool TryOptimizeOperand(OperandToken operand, OperandToken replaceableOperand, SymbolsTable symbolsTable, List<ThreeAddressLine> nextLines)
         {
+            if (GetOperandType(replaceableOperand, symbolsTable) != GetOperandType(operand, symbolsTable)) return false;
+
             if (operand is IdentifierToken)
             {
-                SymbolInfo firstInfo = symbolsTable.GetByIndex((int)operand.AttributeValue);
-                if (firstInfo.IsTemp)
+                SymbolInfo operandInfo = symbolsTable.GetByOperandToken(operand);
+                if (operandInfo.IsTemp && NotUsedLater(nextLines.GetRange(1, nextLines.Count - 1), operand))
                 {
-                    if (UsedLater(lines, operand))
-                    {
-                        ReplaceOperand(replaceableOperand, operand, lines);
-                        DeleteSymbol(symbolsTable, (int)replaceableOperand.AttributeValue);
-                        return true;
-                    }
+                    ReplaceOperand(replaceableOperand, operand, nextLines);
+                    DeleteExtraTemp(symbolsTable, replaceableOperand);
+                    return true;
                 }
             }
             return false;
         }
 
-        private static void DeleteSymbol(SymbolsTable symbolsTable, int attributeValue)
+        private static void DeleteExtraTemp(SymbolsTable symbolsTable, OperandToken operandToken)
         {
-            symbolsTable.DeleteSymbolByIndex(attributeValue);
+            symbolsTable.DeleteByOperandToken(operandToken);
         }
 
-        private static bool UsedLater(List<ThreeAddressLine> lines, OperandToken operand)
+        private static bool NotUsedLater(List<ThreeAddressLine> lines, OperandToken operand)
         {
-            return OperandContains(lines, operand);
+            Console.WriteLine(operand);
+            Console.WriteLine(lines);
+            Console.WriteLine(OperandContains(lines, operand));
+            return !OperandContains(lines, operand);
         }
 
         private static bool OperandContains(List<ThreeAddressLine> lines, OperandToken operand)
@@ -85,7 +85,16 @@ namespace library.compiler.optimization
             for (int i = 0; i < lines.Count; i++)
             {
                 var line = lines[i];
-                if (operand == line.FirstOperand || operand == line.SecondOperand) return true;
+                if(operand == line.FirstOperand)
+                {
+                    Console.WriteLine($"{operand} == {line.FirstOperand}");
+                    return true;
+                }
+                if (operand == line.SecondOperand)
+                {
+                    Console.WriteLine($"{operand} == {line.SecondOperand}");
+                    return true;
+                }
             }
             return false;
         }

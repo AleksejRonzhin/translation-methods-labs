@@ -2,7 +2,6 @@
 using library.compiler.core.tokens;
 using library.compiler.generation;
 using library.compiler.syntax.tree;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace library.compiler.optimization
 {
@@ -10,30 +9,42 @@ namespace library.compiler.optimization
     {
         public static SyntaxTree Optimize(SyntaxTree syntaxTree)
         {
+
+            SyntaxTree optimizedSyntaxTree = OptimizeTree(syntaxTree);
+            Print(syntaxTree, optimizedSyntaxTree);
+            return optimizedSyntaxTree;
+        }
+
+        private static SyntaxTree OptimizeTree(SyntaxTree syntaxTree)
+        {
+            return new(TryOptimizeNode(syntaxTree.HeadNode));
+        }
+
+        private static void Print(SyntaxTree syntaxTree, SyntaxTree newSyntaxTree)
+        {
             Console.WriteLine("Before optimization:");
             Console.WriteLine(InfixNotationGenerator.Generate(syntaxTree));
-            Rec(syntaxTree.HeadNode);
-            var result = new SyntaxTree(TryOptimize(syntaxTree.HeadNode));
             Console.WriteLine("After optimization:");
-            Console.WriteLine(InfixNotationGenerator.Generate(result));
-            return result;
+            Console.WriteLine(InfixNotationGenerator.Generate(newSyntaxTree));
         }
 
-        public static void Rec(SyntaxTreeNode node)
+        private static SyntaxTreeNode TryOptimizeNode(SyntaxTreeNode node)
         {
-            for (int i = 0; i < node.Children.Count; i++)
+            var optimizedNode = OptimizeChildren(node);
+            optimizedNode = TryOptimizeOperation(optimizedNode);
+            optimizedNode = TryOptimizeCast(optimizedNode);
+            return optimizedNode;
+        }
+
+        private static SyntaxTreeNode OptimizeChildren(SyntaxTreeNode node)
+        {
+            var copyNode = new SyntaxTreeNode(node.Value);
+            node.Children.ForEach(child =>
             {
-                var child = node.Children[i];
-                Rec(child);
-                node.ReplaceChild(child, TryOptimize(child));
-            }
-        }
-
-        public static SyntaxTreeNode TryOptimize(SyntaxTreeNode node)
-        {
-            node = TryOptimizeOperation(node);
-            node = TryOptimizeCast(node);
-            return node;
+                var optimizedChild = TryOptimizeNode(child);
+                copyNode.AddChild(optimizedChild);
+            });
+            return copyNode;
         }
 
         private static SyntaxTreeNode TryOptimizeOperation(SyntaxTreeNode node)
@@ -95,9 +106,9 @@ namespace library.compiler.optimization
 
             return operation.Sign switch
             {
-                "+" or "-" when value == 0 => LeaveOneOperand(sourceNode, 0, operation),
+                "+" or "-" when value == 0 => LeaveOneOperand(sourceNode, 0),
                 "*" when value == 0 => GetZeroNode(operandType),
-                "*" or "/" when value == 1 => LeaveOneOperand(sourceNode, 0, operation),
+                "*" or "/" when value == 1 => LeaveOneOperand(sourceNode, 0),
                 _ => sourceNode
             };
         }
@@ -110,14 +121,14 @@ namespace library.compiler.optimization
 
             return operation.Sign switch
             {
-                "+" when value == 0 => LeaveOneOperand(sourceNode, 1, operation),
+                "+" when value == 0 => LeaveOneOperand(sourceNode, 1),
                 "*" or "/" when value == 0 => GetZeroNode(operandType),
-                "*" when value == 1 => LeaveOneOperand(sourceNode, 1, operation),
+                "*" when value == 1 => LeaveOneOperand(sourceNode, 1),
                 _ => sourceNode
             };
         }
 
-        private static SyntaxTreeNode LeaveOneOperand(SyntaxTreeNode node, int operandNumber, Operation operation)
+        private static SyntaxTreeNode LeaveOneOperand(SyntaxTreeNode node, int operandNumber)
         {
             return node.Children[operandNumber];
         }
