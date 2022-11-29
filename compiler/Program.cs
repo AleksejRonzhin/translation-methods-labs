@@ -4,16 +4,21 @@ using library.compiler.core.models;
 using library.compiler.lexis.exceptions;
 using library.compiler.semantic.exceptions;
 using library.compiler.syntax.exceptions;
+using library.input;
 using library.output;
 using library.parameters.exceptions;
 using System.Runtime.Serialization.Formatters.Binary;
 
 Compiler compiler;
+string text;
 
 try
 {
     var mode = new ModeParameter(TakeArgOrThrow(0, "режим")).GetValue();
     var inputFilename = new InputFilenameParameter(TakeArgOrThrow(1, "файл исходного выражения")).GetValue();
+    text = InputTextReader.ReadTextFromFile(inputFilename);
+
+
     using TextReader inputTextReader = new StreamReader(inputFilename);
     compiler = new(inputTextReader);
 
@@ -124,9 +129,9 @@ void BinaryGeneratorAction()
 
     ThreeAddressCode threeAddressCode = compiler.GetThreeAddressCode(true);
     SymbolsTable symbolsTable = compiler.SymbolsTable;
-
     BinaryFormatter formatter = new();
     FileStream fileStream = new FileStream(binaryFileName, FileMode.OpenOrCreate);
+    formatter.Serialize(fileStream, text);
     formatter.Serialize(fileStream, threeAddressCode);
     formatter.Serialize(fileStream, symbolsTable);
     fileStream.Close();

@@ -42,6 +42,7 @@ namespace library.compiler
             }
         }
 
+
         public Compiler(TextReader inputTextReader)
         {
             this._inputTextReader = inputTextReader;

@@ -74,9 +74,6 @@ namespace library.compiler.optimization
 
         private static bool NotUsedLater(List<ThreeAddressLine> lines, OperandToken operand)
         {
-            Console.WriteLine(operand);
-            Console.WriteLine(lines);
-            Console.WriteLine(OperandContains(lines, operand));
             return !OperandContains(lines, operand);
         }
 

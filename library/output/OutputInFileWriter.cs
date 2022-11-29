@@ -6,7 +6,6 @@
         {
             using var writer = new StreamWriter(filename, false);
             writer.Write(text);
-
         }
     }
 }
